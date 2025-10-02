@@ -1,0 +1,411 @@
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.28;
+
+// ============================================================================
+// GHOSTART NFT CONTRACT
+// Free minting NFT collection on World Chain
+// ============================================================================
+
+import "@openzeppelin/contracts/token/ERC721/ERC721.sol";
+import "@openzeppelin/contracts/token/ERC721/extensions/ERC721URIStorage.sol";
+import "@openzeppelin/contracts/access/Ownable.sol";
+import "@openzeppelin/contracts/utils/Counters.sol";
+
+contract GhostArtNFT is ERC721, ERC721URIStorage, Ownable {
+    using Counters for Counters.Counter;
+    Counters.Counter private _tokenIdCounter;
+
+    // Events
+    event NFTMinted(address indexed minter, uint256 indexed tokenId, string tokenURI);
+    event RoyaltyPaid(address indexed creator, uint256 amount);
+
+    // Mapping from token ID to creator address for royalties
+    mapping(uint256 => address) public tokenCreator;
+    
+    // Royalty percentage (5% = 500 basis points)
+    uint256 public royaltyPercentage = 500; // 5%
+    uint256 public constant ROYALTY_DENOMINATOR = 10000;
+
+    constructor() ERC721("GhostArt", "GHOST") Ownable(msg.sender) {}
+
+    /**
+     * @dev Free mint function - anyone can mint
+     * @param to Address to mint to
+     * @param uri IPFS URI for the token metadata
+     * @return tokenId The ID of the newly minted token
+     */
+    function mintNFT(address to, string memory uri) public returns (uint256) {
+        uint256 tokenId = _tokenIdCounter.current();
+        _tokenIdCounter.increment();
+        
+        _safeMint(to, tokenId);
+        _setTokenURI(tokenId, uri);
+        
+        tokenCreator[tokenId] = to;
+        
+        emit NFTMinted(to, tokenId, uri);
+        
+        return tokenId;
+    }
+
+    /**
+     * @dev Batch mint function for multiple NFTs
+     * @param to Address to mint to
+     * @param uris Array of IPFS URIs
+     * @return tokenIds Array of newly minted token IDs
+     */
+    function batchMint(address to, string[] memory uris) public returns (uint256[] memory) {
+        uint256[] memory tokenIds = new uint256[](uris.length);
+        
+        for (uint256 i = 0; i < uris.length; i++) {
+            tokenIds[i] = mintNFT(to, uris[i]);
+        }
+        
+        return tokenIds;
+    }
+
+    /**
+     * @dev Get the creator of a token (for royalty purposes)
+     */
+    function getTokenCreator(uint256 tokenId) public view returns (address) {
+        require(_ownerOf(tokenId) != address(0), "Token does not exist");
+        return tokenCreator[tokenId];
+    }
+
+    /**
+     * @dev Update royalty percentage (only owner)
+     */
+    function setRoyaltyPercentage(uint256 newPercentage) public onlyOwner {
+        require(newPercentage <= 1000, "Royalty too high"); // Max 10%
+        royaltyPercentage = newPercentage;
+    }
+
+    /**
+     * @dev Calculate royalty amount for a sale
+     */
+    function calculateRoyalty(uint256 salePrice) public view returns (uint256) {
+        return (salePrice * royaltyPercentage) / ROYALTY_DENOMINATOR;
+    }
+
+    // Override functions required by Solidity
+    function tokenURI(uint256 tokenId)
+        public
+        view
+        override(ERC721, ERC721URIStorage)
+        returns (string memory)
+    {
+        return super.tokenURI(tokenId);
+    }
+
+    function supportsInterface(bytes4 interfaceId)
+        public
+        view
+        override(ERC721, ERC721URIStorage)
+        returns (bool)
+    {
+        return super.supportsInterface(interfaceId);
+    }
+}
+
+// ============================================================================
+// GHOSTART MARKETPLACE CONTRACT
+// Buy/Sell NFTs with WLD and $GHOSTART tokens
+// ============================================================================
+
+import "@openzeppelin/contracts/token/ERC20/IERC20.sol";
+import "@openzeppelin/contracts/token/ERC721/IERC721.sol";
+import "@openzeppelin/contracts/security/ReentrancyGuard.sol";
+
+contract GhostArtMarketplace is ReentrancyGuard, Ownable {
+    using Counters for Counters.Counter;
+    Counters.Counter private _listingIdCounter;
+
+    // Token addresses
+    IERC20 public wldToken;
+    IERC20 public ghostArtToken;
+    GhostArtNFT public nftContract;
+
+    // Exchange rate: 1 GHOSTART = 0.000009 WLD
+    uint256 public constant GHOSTART_TO_WLD_RATE = 9; // 0.000009 * 1e6
+    uint256 public constant RATE_PRECISION = 1e6;
+
+    // Platform fee (2.5% = 250 basis points)
+    uint256 public platformFee = 250;
+    uint256 public constant FEE_DENOMINATOR = 10000;
+    address public feeCollector;
+
+    struct Listing {
+        uint256 listingId;
+        address seller;
+        address nftContract;
+        uint256 tokenId;
+        uint256 priceWLD;
+        uint256 priceGHOSTART;
+        bool isActive;
+        uint256 listedAt;
+    }
+
+    // Mapping from listing ID to Listing
+    mapping(uint256 => Listing) public listings;
+    
+    // Mapping from NFT contract => token ID => listing ID
+    mapping(address => mapping(uint256 => uint256)) public nftToListing;
+
+    // Events
+    event NFTListed(
+        uint256 indexed listingId,
+        address indexed seller,
+        address indexed nftContract,
+        uint256 tokenId,
+        uint256 priceWLD,
+        uint256 priceGHOSTART
+    );
+    
+    event NFTSold(
+        uint256 indexed listingId,
+        address indexed buyer,
+        address indexed seller,
+        uint256 tokenId,
+        uint256 price,
+        bool paidInGHOSTART
+    );
+    
+    event ListingCancelled(uint256 indexed listingId);
+    event PriceUpdated(uint256 indexed listingId, uint256 newPriceWLD, uint256 newPriceGHOSTART);
+
+    constructor(
+        address _wldToken,
+        address _ghostArtToken,
+        address _nftContract,
+        address _feeCollector
+    ) Ownable(msg.sender) {
+        wldToken = IERC20(_wldToken);
+        ghostArtToken = IERC20(_ghostArtToken);
+        nftContract = GhostArtNFT(_nftContract);
+        feeCollector = _feeCollector;
+    }
+
+    /**
+     * @dev List an NFT for sale
+     * @param nftAddress Address of the NFT contract
+     * @param tokenId Token ID to list
+     * @param priceWLD Price in WLD tokens
+     */
+    function listNFT(
+        address nftAddress,
+        uint256 tokenId,
+        uint256 priceWLD
+    ) public nonReentrant {
+        require(priceWLD > 0, "Price must be greater than 0");
+        
+        IERC721 nft = IERC721(nftAddress);
+        require(nft.ownerOf(tokenId) == msg.sender, "Not the owner");
+        require(
+            nft.isApprovedForAll(msg.sender, address(this)) ||
+            nft.getApproved(tokenId) == address(this),
+            "Marketplace not approved"
+        );
+
+        uint256 listingId = _listingIdCounter.current();
+        _listingIdCounter.increment();
+
+        // Calculate GHOSTART price based on WLD price
+        uint256 priceGHOSTART = convertWLDToGHOSTART(priceWLD);
+
+        listings[listingId] = Listing({
+            listingId: listingId,
+            seller: msg.sender,
+            nftContract: nftAddress,
+            tokenId: tokenId,
+            priceWLD: priceWLD,
+            priceGHOSTART: priceGHOSTART,
+            isActive: true,
+            listedAt: block.timestamp
+        });
+
+        nftToListing[nftAddress][tokenId] = listingId;
+
+        emit NFTListed(listingId, msg.sender, nftAddress, tokenId, priceWLD, priceGHOSTART);
+    }
+
+    /**
+     * @dev Buy NFT with WLD tokens
+     * @param listingId ID of the listing
+     */
+    function buyWithWLD(uint256 listingId) public nonReentrant {
+        Listing storage listing = listings[listingId];
+        require(listing.isActive, "Listing not active");
+        require(msg.sender != listing.seller, "Cannot buy own NFT");
+
+        uint256 price = listing.priceWLD;
+        uint256 platformCut = (price * platformFee) / FEE_DENOMINATOR;
+        uint256 royaltyCut = nftContract.calculateRoyalty(price);
+        uint256 sellerAmount = price - platformCut - royaltyCut;
+
+        // Transfer WLD from buyer
+        require(wldToken.transferFrom(msg.sender, address(this), price), "WLD transfer failed");
+        
+        // Pay platform fee
+        require(wldToken.transfer(feeCollector, platformCut), "Platform fee transfer failed");
+        
+        // Pay royalty to creator
+        address creator = nftContract.getTokenCreator(listing.tokenId);
+        if (royaltyCut > 0 && creator != address(0)) {
+            require(wldToken.transfer(creator, royaltyCut), "Royalty transfer failed");
+        }
+        
+        // Pay seller
+        require(wldToken.transfer(listing.seller, sellerAmount), "Seller payment failed");
+
+        // Transfer NFT to buyer
+        IERC721(listing.nftContract).safeTransferFrom(listing.seller, msg.sender, listing.tokenId);
+
+        // Mark listing as inactive
+        listing.isActive = false;
+        delete nftToListing[listing.nftContract][listing.tokenId];
+
+        emit NFTSold(listingId, msg.sender, listing.seller, listing.tokenId, price, false);
+    }
+
+    /**
+     * @dev Buy NFT with GHOSTART tokens
+     * @param listingId ID of the listing
+     */
+    function buyWithGHOSTART(uint256 listingId) public nonReentrant {
+        Listing storage listing = listings[listingId];
+        require(listing.isActive, "Listing not active");
+        require(msg.sender != listing.seller, "Cannot buy own NFT");
+
+        uint256 price = listing.priceGHOSTART;
+        uint256 platformCut = (price * platformFee) / FEE_DENOMINATOR;
+        uint256 royaltyCut = (nftContract.calculateRoyalty(listing.priceWLD) * price) / listing.priceWLD;
+        uint256 sellerAmount = price - platformCut - royaltyCut;
+
+        // Transfer GHOSTART from buyer
+        require(ghostArtToken.transferFrom(msg.sender, address(this), price), "GHOSTART transfer failed");
+        
+        // Pay platform fee
+        require(ghostArtToken.transfer(feeCollector, platformCut), "Platform fee transfer failed");
+        
+        // Pay royalty to creator
+        address creator = nftContract.getTokenCreator(listing.tokenId);
+        if (royaltyCut > 0 && creator != address(0)) {
+            require(ghostArtToken.transfer(creator, royaltyCut), "Royalty transfer failed");
+        }
+        
+        // Pay seller
+        require(ghostArtToken.transfer(listing.seller, sellerAmount), "Seller payment failed");
+
+        // Transfer NFT to buyer
+        IERC721(listing.nftContract).safeTransferFrom(listing.seller, msg.sender, listing.tokenId);
+
+        // Mark listing as inactive
+        listing.isActive = false;
+        delete nftToListing[listing.nftContract][listing.tokenId];
+
+        emit NFTSold(listingId, msg.sender, listing.seller, listing.tokenId, price, true);
+    }
+
+    /**
+     * @dev Cancel a listing
+     * @param listingId ID of the listing to cancel
+     */
+    function cancelListing(uint256 listingId) public {
+        Listing storage listing = listings[listingId];
+        require(listing.isActive, "Listing not active");
+        require(msg.sender == listing.seller, "Not the seller");
+
+        listing.isActive = false;
+        delete nftToListing[listing.nftContract][listing.tokenId];
+
+        emit ListingCancelled(listingId);
+    }
+
+    /**
+     * @dev Update listing price
+     * @param listingId ID of the listing
+     * @param newPriceWLD New price in WLD
+     */
+    function updatePrice(uint256 listingId, uint256 newPriceWLD) public {
+        Listing storage listing = listings[listingId];
+        require(listing.isActive, "Listing not active");
+        require(msg.sender == listing.seller, "Not the seller");
+        require(newPriceWLD > 0, "Price must be greater than 0");
+
+        listing.priceWLD = newPriceWLD;
+        listing.priceGHOSTART = convertWLDToGHOSTART(newPriceWLD);
+
+        emit PriceUpdated(listingId, newPriceWLD, listing.priceGHOSTART);
+    }
+
+    /**
+     * @dev Convert WLD price to GHOSTART price
+     */
+    function convertWLDToGHOSTART(uint256 wldAmount) public pure returns (uint256) {
+        // 1 GHOSTART = 0.000009 WLD
+        // So WLD / 0.000009 = GHOSTART
+        return (wldAmount * RATE_PRECISION) / GHOSTART_TO_WLD_RATE;
+    }
+
+    /**
+     * @dev Convert GHOSTART price to WLD price
+     */
+    function convertGHOSTARTToWLD(uint256 ghostartAmount) public pure returns (uint256) {
+        return (ghostartAmount * GHOSTART_TO_WLD_RATE) / RATE_PRECISION;
+    }
+
+    /**
+     * @dev Get listing details
+     */
+    function getListing(uint256 listingId) public view returns (Listing memory) {
+        return listings[listingId];
+    }
+
+    /**
+     * @dev Get active listings count
+     */
+    function getActiveListingsCount() public view returns (uint256) {
+        uint256 count = 0;
+        uint256 totalListings = _listingIdCounter.current();
+        
+        for (uint256 i = 0; i < totalListings; i++) {
+            if (listings[i].isActive) {
+                count++;
+            }
+        }
+        
+        return count;
+    }
+
+    /**
+     * @dev Update platform fee (only owner)
+     */
+    function setPlatformFee(uint256 newFee) public onlyOwner {
+        require(newFee <= 1000, "Fee too high"); // Max 10%
+        platformFee = newFee;
+    }
+
+    /**
+     * @dev Update fee collector address (only owner)
+     */
+    function setFeeCollector(address newCollector) public onlyOwner {
+        require(newCollector != address(0), "Invalid address");
+        feeCollector = newCollector;
+    }
+
+    /**
+     * @dev Emergency withdraw (only owner)
+     */
+    function emergencyWithdraw() public onlyOwner {
+        uint256 wldBalance = wldToken.balanceOf(address(this));
+        uint256 ghostartBalance = ghostArtToken.balanceOf(address(this));
+        
+        if (wldBalance > 0) {
+            wldToken.transfer(owner(), wldBalance);
+        }
+        
+        if (ghostartBalance > 0) {
+            ghostArtToken.transfer(owner(), ghostartBalance);
+        }
+    }
+}
