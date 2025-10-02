@@ -1,0 +1,380 @@
+# GHOSTART NFT Marketplace - Deployment Guide
+
+Complete guide to deploy your NFT marketplace smart contracts on World Chain.
+
+## 📋 Prerequisites
+
+1. **Foundry installed**
+```bash
+curl -L https://foundry.paradigm.xyz | bash
+foundryup
+```
+
+2. **OpenZeppelin Contracts**
+```bash
+forge install OpenZeppelin/openzeppelin-contracts
+```
+
+## 🚀 Step 1: Create Project
+
+```bash
+# Create new Foundry project
+forge init ghostart-marketplace
+cd ghostart-marketplace
+
+# Install dependencies
+forge install OpenZeppelin/openzeppelin-contracts
+```
+
+## 📝 Step 2: Add Contracts
+
+Create the contract files in the `src/` directory:
+
+1. **src/GhostArtNFT.sol** - NFT collection contract
+2. **src/GhostArtMarketplace.sol** - Marketplace contract
+
+## 🔧 Step 3: Configure Foundry
+
+Update `foundry.toml`:
+
+```toml
+[profile.default]
+src = "src"
+out = "out"
+libs = ["lib"]
+solc_version = "0.8.28"
+optimizer = true
+optimizer_runs = 200
+remappings = [
+    "@openzeppelin/=lib/openzeppelin-contracts/"
+]
+
+[rpc_endpoints]
+worldchain-mainnet = "https://worldchain-mainnet.g.alchemy.com/public"
+worldchain-sepolia = "https://worldchain-sepolia.g.alchemy.com/public"
+```
+
+## ✅ Step 4: Create Tests
+
+Create `test/GhostArtTest.t.sol`:
+
+```solidity
+// SPDX-License-Identifier: MIT
+pragma solidity ^0.8.28;
+
+import "forge-std/Test.sol";
+import "../src/GhostArtNFT.sol";
+import "../src/GhostArtMarketplace.sol";
+import "@openzeppelin/contracts/token/ERC20/ERC20.sol";
+
+// Mock ERC20 token for testing
+contract MockERC20 is ERC20 {
+    constructor(string memory name, string memory symbol) ERC20(name, symbol) {
+        _mint(msg.sender, 1000000 * 10**18);
+    }
+    
+    function mint(address to, uint256 amount) public {
+        _mint(to, amount);
+    }
+}
+
+contract GhostArtTest is Test {
+    GhostArtNFT public nft;
+    GhostArtMarketplace public marketplace;
+    MockERC20 public wldToken;
+    MockERC20 public ghostArtToken;
+    
+    address public owner = address(1);
+    address public seller = address(2);
+    address public buyer = address(3);
+    address public feeCollector = address(4);
+    
+    function setUp() public {
+        vm.startPrank(owner);
+        
+        // Deploy tokens
+        wldToken = new MockERC20("World Token", "WLD");
+        ghostArtToken = new MockERC20("GhostArt Token", "GHOSTART");
+        
+        // Deploy NFT contract
+        nft = new GhostArtNFT();
+        
+        // Deploy marketplace
+        marketplace = new GhostArtMarketplace(
+            address(wldToken),
+            address(ghostArtToken),
+            address(nft),
+            feeCollector
+        );
+        
+        // Mint tokens to seller and buyer
+        wldToken.mint(seller, 10000 * 10**18);
+        wldToken.mint(buyer, 10000 * 10**18);
+        ghostArtToken.mint(buyer, 100000000 * 10**18);
+        
+        vm.stopPrank();
+    }
+    
+    function testMintNFT() public {
+        vm.prank(seller);
+        uint256 tokenId = nft.mintNFT(seller, "ipfs://QmTest123");
+        
+        assertEq(nft.ownerOf(tokenId), seller);
+        assertEq(nft.tokenURI(tokenId), "ipfs://QmTest123");
+    }
+    
+    function testListNFT() public {
+        // Mint NFT
+        vm.prank(seller);
+        uint256 tokenId = nft.mintNFT(seller, "ipfs://QmTest123");
+        
+        // Approve marketplace
+        vm.prank(seller);
+        nft.setApprovalForAll(address(marketplace), true);
+        
+        // List NFT
+        vm.prank(seller);
+        marketplace.listNFT(address(nft), tokenId, 100 * 10**18);
+        
+        // Check listing
+        GhostArtMarketplace.Listing memory listing = marketplace.getListing(0);
+        assertEq(listing.seller, seller);
+        assertEq(listing.tokenId, tokenId);
+        assertTrue(listing.isActive);
+    }
+    
+    function testBuyWithWLD() public {
+        // Mint and list NFT
+        vm.prank(seller);
+        uint256 tokenId = nft.mintNFT(seller, "ipfs://QmTest123");
+        
+        vm.prank(seller);
+        nft.setApprovalForAll(address(marketplace), true);
+        
+        vm.prank(seller);
+        marketplace.listNFT(address(nft), tokenId, 100 * 10**18);
+        
+        // Approve WLD for marketplace
+        vm.prank(buyer);
+        wldToken.approve(address(marketplace), 100 * 10**18);
+        
+        // Buy NFT
+        vm.prank(buyer);
+        marketplace.buyWithWLD(0);
+        
+        // Verify ownership transferred
+        assertEq(nft.ownerOf(tokenId), buyer);
+    }
+    
+    function testBuyWithGHOSTART() public {
+        // Mint and list NFT
+        vm.prank(seller);
+        uint256 tokenId = nft.mintNFT(seller, "ipfs://QmTest123");
+        
+        vm.prank(seller);
+        nft.setApprovalForAll(address(marketplace), true);
+        
+        vm.prank(seller);
+        marketplace.listNFT(address(nft), tokenId, 100 * 10**18);
+        
+        // Get GHOSTART price
+        GhostArtMarketplace.Listing memory listing = marketplace.getListing(0);
+        
+        // Approve GHOSTART for marketplace
+        vm.prank(buyer);
+        ghostArtToken.approve(address(marketplace), listing.priceGHOSTART);
+        
+        // Buy NFT
+        vm.prank(buyer);
+        marketplace.buyWithGHOSTART(0);
+        
+        // Verify ownership transferred
+        assertEq(nft.ownerOf(tokenId), buyer);
+    }
+    
+    function testCancelListing() public {
+        // Mint and list NFT
+        vm.prank(seller);
+        uint256 tokenId = nft.mintNFT(seller, "ipfs://QmTest123");
+        
+        vm.prank(seller);
+        nft.setApprovalForAll(address(marketplace), true);
+        
+        vm.prank(seller);
+        marketplace.listNFT(address(nft), tokenId, 100 * 10**18);
+        
+        // Cancel listing
+        vm.prank(seller);
+        marketplace.cancelListing(0);
+        
+        // Check listing is inactive
+        GhostArtMarketplace.Listing memory listing = marketplace.getListing(0);
+        assertFalse(listing.isActive);
+    }
+}
+```
+
+Run tests:
+```bash
+forge test -vvv
+```
+
+## 🔑 Step 5: Generate Wallet
+
+```bash
+cast wallet new
+```
+
+Save the output:
+- **Address**: Your deployment address
+- **Private Key**: Keep this SECRET!
+
+## 💰 Step 6: Fund Wallet
+
+Get testnet ETH from [World Chain Sepolia Faucet](https://www.alchemy.com/faucets/world-chain-sepolia)
+
+Check balance:
+```bash
+cast balance YOUR_ADDRESS --rpc-url https://worldchain-sepolia.g.alchemy.com/public
+```
+
+## 🚀 Step 7: Deploy to World Chain Sepolia
+
+### Deploy NFT Contract
+
+```bash
+forge create src/GhostArtNFT.sol:GhostArtNFT \
+  --rpc-url https://worldchain-sepolia.g.alchemy.com/public \
+  --private-key YOUR_PRIVATE_KEY \
+  --verify \
+  --etherscan-api-key YOUR_WORLDSCAN_API_KEY
+```
+
+Save the deployed NFT contract address!
+
+### Deploy Marketplace Contract
+
+```bash
+forge create src/GhostArtMarketplace.sol:GhostArtMarketplace \
+  --rpc-url https://worldchain-sepolia.g.alchemy.com/public \
+  --private-key YOUR_PRIVATE_KEY \
+  --constructor-args \
+    "WLD_TOKEN_ADDRESS" \
+    "GHOSTART_TOKEN_ADDRESS" \
+    "NFT_CONTRACT_ADDRESS" \
+    "FEE_COLLECTOR_ADDRESS" \
+  --verify \
+  --etherscan-api-key YOUR_WORLDSCAN_API_KEY
+```
+
+**Constructor Arguments:**
+- `WLD_TOKEN_ADDRESS`: `0x2cFc85d8E48F8EAB294be644d9E25C3030863003`
+- `GHOSTART_TOKEN_ADDRESS`: `0x4df029e25EA0043fCBfb7A7f15f2b25F62C9BDb990`
+- `NFT_CONTRACT_ADDRESS`: Your deployed NFT contract address
+- `FEE_COLLECTOR_ADDRESS`: Your wallet address for collecting fees
+
+## 🌐 Step 8: Deploy to World Chain Mainnet
+
+**⚠️ IMPORTANT: Test thoroughly on Sepolia first!**
+
+```bash
+# Deploy NFT
+forge create src/GhostArtNFT.sol:GhostArtNFT \
+  --rpc-url https://worldchain-mainnet.g.alchemy.com/public \
+  --private-key YOUR_PRIVATE_KEY \
+  --verify
+
+# Deploy Marketplace
+forge create src/GhostArtMarketplace.sol:GhostArtMarketplace \
+  --rpc-url https://worldchain-mainnet.g.alchemy.com/public \
+  --private-key YOUR_PRIVATE_KEY \
+  --constructor-args \
+    "0x2cFc85d8E48F8EAB294be644d9E25C3030863003" \
+    "0x4df029e25EA0043fCBfb7A7f15f2b25F62C9BDb990" \
+    "YOUR_NFT_CONTRACT_ADDRESS" \
+    "YOUR_FEE_COLLECTOR_ADDRESS" \
+  --verify
+```
+
+## 🔍 Step 9: Verify Contracts
+
+If verification fails during deployment, verify manually:
+
+```bash
+# Verify NFT
+forge verify-contract \
+  YOUR_NFT_CONTRACT_ADDRESS \
+  src/GhostArtNFT.sol:GhostArtNFT \
+  --chain-id 480 \
+  --etherscan-api-key YOUR_WORLDSCAN_API_KEY
+
+# Verify Marketplace
+forge verify-contract \
+  YOUR_MARKETPLACE_CONTRACT_ADDRESS \
+  src/GhostArtMarketplace.sol:GhostArtMarketplace \
+  --chain-id 480 \
+  --constructor-args $(cast abi-encode "constructor(address,address,address,address)" "WLD_ADDRESS" "GHOSTART_ADDRESS" "NFT_ADDRESS" "FEE_ADDRESS") \
+  --etherscan-api-key YOUR_WORLDSCAN_API_KEY
+```
+
+## 📱 Step 10: Integrate with Frontend
+
+Update your React app with deployed contract addresses:
+
+```javascript
+const CONTRACTS = {
+  NFT_COLLECTION: 'YOUR_DEPLOYED_NFT_ADDRESS',
+  MARKETPLACE: 'YOUR_DEPLOYED_MARKETPLACE_ADDRESS',
+  WLD_TOKEN: '0x2cFc85d8E48F8EAB294be644d9E25C3030863003',
+  GHOSTART_TOKEN: '0x4df029e25EA0043fCBfb7A7f15f2b25F62C9BDb990'
+};
+```
+
+## 🛠️ Useful Commands
+
+### Interact with Contracts
+
+```bash
+# Mint NFT
+cast send YOUR_NFT_ADDRESS "mintNFT(address,string)" YOUR_ADDRESS "ipfs://QmYourHash" \
+  --rpc-url https://worldchain-mainnet.g.alchemy.com/public \
+  --private-key YOUR_PRIVATE_KEY
+
+# List NFT on Marketplace
+cast send YOUR_MARKETPLACE_ADDRESS "listNFT(address,uint256,uint256)" \
+  YOUR_NFT_ADDRESS TOKEN_ID PRICE_IN_WEI \
+  --rpc-url https://worldchain-mainnet.g.alchemy.com/public \
+  --private-key YOUR_PRIVATE_KEY
+
+# Check listing
+cast call YOUR_MARKETPLACE_ADDRESS "getListing(uint256)(tuple)" LISTING_ID \
+  --rpc-url https://worldchain-mainnet.g.alchemy.com/public
+
+# Get NFT owner
+cast call YOUR_NFT_ADDRESS "ownerOf(uint256)(address)" TOKEN_ID \
+  --rpc-url https://worldchain-mainnet.g.alchemy.com/public
+```
+
+## 📊 Gas Optimization Tips
+
+1. **Batch Operations**: Use `batchMint` for multiple NFTs
+2. **Approve Once**: Set approval for all instead of per-token
+3. **Optimize Storage**: Use packed structs where possible
+4. **Use Events**: Monitor transactions via events instead of storage reads
+
+## 🔐 Security Checklist
+
+- ✅ ReentrancyGuard on all payment functions
+- ✅ Access control (Ownable) for admin functions
+- ✅ Input validation on all public functions
+- ✅ Safe transfer patterns for ERC20/ERC721
+- ✅ Emergency withdraw function
+- ✅ Royalty payments to creators
+- ✅ Platform fee collection
+
+## 📚 Additional Resources
+
+- [World Chain Docs](https://world.org/developers)
+- [Foundry Book](https://book.getfoundry.sh/)
+- [OpenZeppelin Contracts](https://docs.openzeppelin.com/contracts/)
+- [Worlds
