@@ -1,6 +1,6 @@
 {
   "name": "GHOSTART",
   "description": "GHOSTART is a mini-app built on World Chain that fuses NFT art collectibles with the power of community-driven meme coins. Collect, trade, and showcase stunning illustrations of ghost riders, flaming skulls, alien punks, and glitch spirits, all while fueling the growth of our official token $GHOSTART.",
-  "iconUrl": "1.png",
+  "iconUrl": "/ghostart-icon.png",
   "requestFramePermissions": []
 }

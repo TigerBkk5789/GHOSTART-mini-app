@@ -71,7 +71,7 @@ const Marketplace: React.FC = () => {
     <div className="p-4">
       <header className="flex justify-between items-center mb-6">
         <div className="flex items-center gap-4">
-          <img src="1.png" alt="GHOSTART icon" className="w-12 h-12 rounded-lg shadow-md shadow-brand-pink/30" />
+          <img src="/ghostart-icon.png" alt="GHOSTART icon" className="w-12 h-12 rounded-lg shadow-md shadow-brand-pink/30" />
           <h1 className="text-3xl font-bold">Marketplace</h1>
         </div>
         <button

@@ -132,7 +132,7 @@ const Wallet: React.FC = () => {
         return (
             <div className="flex flex-col items-center justify-center min-h-[calc(100vh-10rem)] p-4 text-center">
                 <div className="text-center mb-6">
-                    <img src="1.png" alt="GHOSTART icon" className="w-24 h-24 mx-auto mb-4 rounded-2xl shadow-lg shadow-brand-purple/40" />
+                    <img src="/ghostart-icon.png" alt="GHOSTART icon" className="w-24 h-24 mx-auto mb-4 rounded-2xl shadow-lg shadow-brand-purple/40" />
                     <h1 className="text-3xl font-bold">Connect Wallet</h1>
                 </div>
                 <p className="text-gray-400 mb-8 max-w-sm">
@@ -190,7 +190,7 @@ const Wallet: React.FC = () => {
         <>
             <div className="p-4 space-y-6">
                 <div className="flex items-center gap-4">
-                    <img src="1.png" alt="GHOSTART icon" className="w-12 h-12 rounded-lg shadow-md shadow-brand-pink/30" />
+                    <img src="/ghostart-icon.png" alt="GHOSTART icon" className="w-12 h-12 rounded-lg shadow-md shadow-brand-pink/30" />
                     <div>
                         <h1 className="text-3xl font-bold">My Wallet {isOwnerAddress(walletAddress) && <span className="ml-2 text-xs px-2 py-0.5 rounded-full bg-yellow-500 text-black align-super">ADMIN</span>}</h1>
                         <p className="text-gray-400 text-xs font-mono break-all">{walletAddress}</p>

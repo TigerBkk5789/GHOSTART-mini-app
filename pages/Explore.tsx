@@ -4,7 +4,7 @@ const Explore: React.FC = () => {
   return (
     <div className="min-h-screen bg-black text-white p-4 pt-8">
       <header className="text-center mb-8 animate-fade-in-down">
-        <img src="1.png" alt="GHOSTART Logo" className="w-32 h-32 mx-auto mb-4 rounded-2xl shadow-lg shadow-brand-pink/50" />
+        <img src="/ghostart-logo.png" alt="GHOSTART Logo" className="w-32 h-32 mx-auto mb-4 rounded-2xl shadow-lg shadow-brand-pink/50" />
         <h1 className="text-5xl font-bold tracking-tighter bg-clip-text text-transparent bg-gradient-to-r from-brand-purple via-brand-pink to-brand-blue">
           GHOSTART
         </h1>

@@ -54,7 +54,7 @@ const Mint: React.FC = () => {
     return (
         <div className="p-4 max-w-md mx-auto">
             <div className="text-center mb-6">
-                <img src="1.png" alt="GHOSTART icon" className="w-20 h-20 mx-auto mb-3 rounded-2xl shadow-lg shadow-brand-purple/40" />
+                <img src="/ghostart-icon.png" alt="GHOSTART icon" className="w-20 h-20 mx-auto mb-3 rounded-2xl shadow-lg shadow-brand-purple/40" />
                 <h1 className="text-3xl font-bold">Create Your NFT</h1>
             </div>
 
