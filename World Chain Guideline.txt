@@ -1,0 +1,1803 @@
+Solidity
+Solidity is an object-oriented, high-level language for implementing smart contracts. Smart contracts are programs that govern the behavior of accounts within the Ethereum state.
+
+Solidity is a curly-bracket language designed to target the Ethereum Virtual Machine (EVM). It is influenced by C++, Python, and JavaScript. You can find more details about which languages Solidity has been inspired by in the language influences section.
+
+Solidity is statically typed, supports inheritance, libraries, and complex user-defined types, among other features.
+
+With Solidity, you can create contracts for uses such as voting, crowdfunding, blind auctions, and multi-signature wallets.
+
+When deploying contracts, you should use the latest released version of Solidity. Apart from exceptional cases, only the latest version receives security fixes. Furthermore, breaking changes, as well as new features, are introduced regularly. We currently use a 0.y.z version number to indicate this fast pace of change.
+
+Warning
+
+Solidity recently released the 0.8.x version that introduced a lot of breaking changes. Make sure you read the full list.
+
+Ideas for improving Solidity or this documentation are always welcome, read our contributors guide for more details.
+
+Hint
+
+You can download this documentation as PDF, HTML or Epub by clicking on the versions flyout menu in the bottom-left corner and selecting the preferred download format.
+
+Getting Started
+1. Understand the Smart Contract Basics
+
+If you are new to the concept of smart contracts, we recommend you to get started by digging into the “Introduction to Smart Contracts” section, which covers the following:
+
+A simple example smart contract written in Solidity.
+
+Blockchain Basics.
+
+The Ethereum Virtual Machine.
+
+2. Get to Know Solidity
+
+Once you are accustomed to the basics, we recommend you read the “Solidity by Example” and “Language Description” sections to understand the core concepts of the language.
+
+3. Install the Solidity Compiler
+
+There are various ways to install the Solidity compiler, simply choose your preferred option and follow the steps outlined on the installation page.
+
+Hint
+
+You can try out code examples directly in your browser with the Remix IDE. Remix is a web browser-based IDE that allows you to write, deploy and administer Solidity smart contracts, without the need to install Solidity locally.
+
+Warning
+
+As humans write software, it can have bugs. Therefore, you should follow established software development best practices when writing your smart contracts. This includes code review, testing, audits, and correctness proofs. Smart contract users are sometimes more confident with code than their authors, and blockchains and smart contracts have their own unique issues to watch out for, so before working on production code, make sure you read the Security Considerations section.
+
+4. Learn More
+
+If you want to learn more about building decentralized applications on Ethereum, the Ethereum Developer Resources can help you with further general documentation around Ethereum, and a wide selection of tutorials, tools, and development frameworks.
+
+If you have any questions, you can try searching for answers or asking on the Ethereum StackExchange, or our Gitter channel.
+
+Translations
+Community contributors help translate this documentation into several languages. Note that they have varying degrees of completeness and up-to-dateness. The English version stands as a reference.
+
+You can switch between languages by clicking on the flyout menu in the bottom-left corner and selecting the preferred language.
+
+Chinese
+
+French
+
+Indonesian
+
+Japanese
+
+Korean
+
+Persian
+
+Russian
+
+Spanish
+
+Turkish
+
+Note
+
+We set up a GitHub organization and translation workflow to help streamline the community efforts. Please refer to the translation guide in the solidity-docs org for information on how to start a new language or contribute to the community translations.
+
+Contents
+Keyword Index, Search Page
+
+Basics
+
+Introduction to Smart Contracts
+A Simple Smart Contract
+Blockchain Basics
+The Ethereum Virtual Machine
+Solidity by Example
+Voting
+Blind Auction
+Safe Remote Purchase
+Micropayment Channel
+Modular Contracts
+Installing the Solidity Compiler
+Versioning
+Remix
+npm / Node.js
+Docker
+Linux Packages
+macOS Packages
+Static Binaries
+Building from Source
+CMake Options
+The Version String in Detail
+Important Information About Versioning
+Language Description
+
+Layout of a Solidity Source File
+SPDX License Identifier
+Pragmas
+Importing other Source Files
+Comments
+Structure of a Contract
+State Variables
+Functions
+Function Modifiers
+Events
+Errors
+Struct Types
+Enum Types
+Types
+Value Types
+Reference Types
+Mapping Types
+Operators
+Conversions between Elementary Types
+Conversions between Literals and Elementary Types
+Units and Globally Available Variables
+Ether Units
+Time Units
+Special Variables and Functions
+Reserved Keywords
+Expressions and Control Structures
+Control Structures
+Function Calls
+Creating Contracts via new
+Order of Evaluation of Expressions
+Assignment
+Scoping and Declarations
+Checked or Unchecked Arithmetic
+Error handling: Assert, Require, Revert and Exceptions
+Contracts
+Creating Contracts
+Visibility and Getters
+Function Modifiers
+Transient Storage
+Composability of Smart Contracts and the Caveats of Transient Storage
+Constant and Immutable State Variables
+Functions
+Events
+Custom Errors
+Inheritance
+Abstract Contracts
+Interfaces
+Libraries
+Using For
+Inline Assembly
+Example
+Access to External Variables, Functions and Libraries
+Things to Avoid
+Conventions in Solidity
+Advanced Safe Use of Memory
+Cheatsheet
+Order of Precedence of Operators
+ABI Encoding and Decoding Functions
+Members of bytes and string
+Members of address
+Block and Transaction Properties
+Validations and Assertions
+Mathematical and Cryptographic Functions
+Contract-related
+Type Information
+Function Visibility Specifiers
+Modifiers
+Language Grammar
+Compiler
+
+Using the Compiler
+Using the Commandline Compiler
+Setting the EVM Version to Target
+Compiler Input and Output JSON Description
+Analysing the Compiler Output
+Solidity IR-based Codegen Changes
+Semantic Only Changes
+Internals
+Internals
+
+Layout of State Variables in Storage and Transient Storage
+Mappings and Dynamic Arrays
+JSON Output
+Layout in Memory
+Differences to Layout in Storage
+Layout of Call Data
+Cleaning Up Variables
+Source Mappings
+The Optimizer
+Benefits of Optimizing Solidity Code
+Differences between Optimized and Non-Optimized Code
+Optimizer Parameter Runs
+Opcode-Based Optimizer Module
+Yul-Based Optimizer Module
+Codegen-Based Optimizer Module
+Contract Metadata
+Encoding of the Metadata Hash in the Bytecode
+Usage for Automatic Interface Generation and NatSpec
+Usage for Source Code Verification
+Contract ABI Specification
+Basic Design
+Function Selector
+Argument Encoding
+Types
+Design Criteria for the Encoding
+Formal Specification of the Encoding
+Function Selector and Argument Encoding
+Examples
+Use of Dynamic Types
+Events
+Errors
+JSON
+Strict Encoding Mode
+Non-standard Packed Mode
+Encoding of Indexed Event Parameters
+Advisory content
+
+Security Considerations
+Pitfalls
+Recommendations
+List of Known Bugs
+Solidity v0.5.0 Breaking Changes
+Semantic Only Changes
+Semantic and Syntactic Changes
+Explicitness Requirements
+Deprecated Elements
+Interoperability With Older Contracts
+Example
+Solidity v0.6.0 Breaking Changes
+Changes the Compiler Might not Warn About
+Explicitness Requirements
+Semantic and Syntactic Changes
+New Features
+Interface Changes
+How to update your code
+Solidity v0.7.0 Breaking Changes
+Silent Changes of the Semantics
+Changes to the Syntax
+Removal of Unused or Unsafe Features
+Interface Changes
+How to update your code
+Solidity v0.8.0 Breaking Changes
+Silent Changes of the Semantics
+New Restrictions
+Interface Changes
+How to update your code
+Additional Material
+
+NatSpec Format
+Documentation Example
+Tags
+Documentation Output
+SMTChecker and Formal Verification
+Tutorial
+SMTChecker Options and Tuning
+Abstraction and False Positives
+Real World Assumptions
+Yul
+Motivation and High-level Description
+Simple Example
+Stand-Alone Usage
+Informal Description of Yul
+Specification of Yul
+Specification of Yul Object
+Yul Optimizer
+Complete ERC20 Example
+Import Path Resolution
+Virtual Filesystem
+Imports
+Base Path and Include Paths
+Allowed Paths
+Import Remapping
+Using URLs in imports
+Resources
+
+Style Guide
+Introduction
+Code Layout
+Order of Layout
+Naming Conventions
+NatSpec
+Common Patterns
+Withdrawal from Contracts
+Restricting Access
+State Machine
+Resources
+General Resources
+Integrated (Ethereum) Development Environments
+Editor Integrations
+Solidity Tools
+Third-Party Solidity Parsers and Grammars
+Contributing
+Team Calls
+How to Report Issues
+Workflow for Pull Requests
+Running the Compiler Tests
+Running the Fuzzer via AFL
+Whiskers
+Documentation Style Guide
+Solidity Language Design
+Language Influences
+Solidity Brand Guide
+The Solidity Brand
+Solidity Brand Name
+Solidity Logo License
+Solidity Logo Guidelines
+Credits
+
+
+# Deploy Smart Contracts
+
+> Deploy a HelloWorldChain smart contract to World Chain Sepolia using Foundry: setup, build, test, fund, and create.
+
+In this tutorial, we will use the [Solidity programming language](https://docs.soliditylang.org/en/v0.8.28/) to write the `HelloWorldChain` smart contract for World Chain.
+Solidity is a programming language that can compile to EVM (Ethereum Virtual Machine) bytecode which can be executed on the World Chain EVM.
+We will also be using the [Foundry CLI](https://book.getfoundry.sh/) toolkit, which has a lot of tools to help build, test and interact with Solidity programs.
+
+## Download development tools
+
+First, we need to install the Foundry CLI toolkit and the Solidity compiler. Solidity comes with a compiler called `solc` which we will use to compile the `HelloWorldChain` contract. The Foundry CLI
+will automatically download the right version of the Solidity compiler for you during the compilation process using `forge build`.
+
+<CodeGroup>
+  `bash Install Foundry curl -L https://foundry.paradigm.xyz | bash `
+</CodeGroup>
+
+## Create a Foundry project
+
+Open your terminal of choice, navigate to a directory where you want to create your project, and run the following command to create a new Foundry project:
+
+<CodeGroup>
+  ````bash Create a new Foundry project forge init hello-world-chain && cd theme={null}
+  hello-world-chain ```
+  </CodeGroup>
+
+  Now that you have created a new Foundry project, you can start writing your smart contract. All smart contracts in Foundry projects are stored in the `src` directory.
+  If you are using VSCode, it should look something like this:
+
+  ![Foundry 1](/images/docs/world-chain/foundry-1.png)
+
+  ## Write the HelloWorldChain contract
+
+  First, delete the template file called Counter.sol in the /src directory:
+
+  <CodeGroup>```bash Delete Template rm src/Counter.sol ```</CodeGroup>
+
+  Next, create a new file called HelloWorldChain.sol in the /src directory and add the following code to it:
+
+  <CodeGroup>
+  ```solidity HelloWorldChain.sol
+  // SPDX-License-Identifier: MIT
+  pragma solidity ^0.8.28;
+
+  contract HelloWorldChain {
+  string private word;
+
+    // Constructor that sets the initial word to "Hello World Chain!"
+    constructor() {
+        word = "Hello World Chain!";
+    }
+
+    // Setter function to update the word
+    function setWord(string memory newWord) public {
+        word = newWord;
+    }
+
+    // Getter function to return the current word
+    function getWord() public view returns (string memory) {
+        return word;
+    }
+
+  }
+
+  ````
+</CodeGroup>
+
+This contract has a `word` variable that stores a string and two functions: `setWord` to update the word and `getWord` to return the current word.
+
+## Update Scripts and Tests
+
+Since we deleted `Counter.sol`, we need to update or remove the scripts and tests that reference it to prevent compilation errors.
+
+**Delete the `script` directory**
+
+The script directory contains scripts that import `Counter.sol`. Since we no longer have `Counter.sol`, we can delete the entire script directory to avoid any compilation issues:
+
+<CodeGroup>
+  ```bash Delete Script Directory theme={null}
+  rm -rf script
+  ```
+</CodeGroup>
+
+**Replace** `Counter.t.sol` with `HelloWorldChain.t.sol`
+
+In the test directory, delete the existing `Counter.t.sol` and create a new test file called `HelloWorldChain.t.sol` and add the following simple tests:
+
+<CodeGroup>
+  ```solidity HelloWorldChain.t.sol theme={null}
+  // SPDX-License-Identifier: MIT
+  pragma solidity ^0.8.28;
+
+  import "forge-std/Test.sol";
+  import "../src/HelloWorldChain.sol";
+
+  contract HelloWorldChainTest is Test {
+  HelloWorldChain helloWorldChain;
+
+      function setUp() public {
+          helloWorldChain = new HelloWorldChain();
+      }
+
+      function testInitialWord() public view {
+          string memory expected = "Hello World Chain!";
+          string memory actual = helloWorldChain.getWord();
+          assertEq(actual, expected);
+      }
+
+      function testSetWord() public {
+          string memory newWord = "Hello Foundry!";
+          helloWorldChain.setWord(newWord);
+          string memory actual = helloWorldChain.getWord();
+          assertEq(actual, newWord);
+      }
+
+  }
+
+  ```
+</CodeGroup>
+
+**Now You can Run tests:**
+
+<CodeGroup>
+  ```bash Test the contract theme={null}
+  forge test
+  ```
+</CodeGroup>
+
+## Compile the contract
+
+To compile the `HelloWorldChain` contract, run the following command:
+
+<CodeGroup>`bash Compile the contract forge build `</CodeGroup>
+
+The `forge build` command will compile the contract using the Solidity compiler and generate the necessary artifacts in the `artifacts` directory.
+
+## Generate a wallet
+
+To deploy the `HelloWorldChain` contract to World Chain Sepolia, you will need a wallet with some World Chain Sepolia ETH. An easy way to generate a
+wallet using the Foundry CLI is to run the following command:
+
+<CodeGroup>`bash Generate a wallet cast wallet new `</CodeGroup>
+
+`cast` is a versatile set of utility functions and commands for Solidity development. In this case, we are using one of its many built-in features to generate a wallet with one account.
+
+<Note>
+  Never share your private key with anyone and always make sure that you don't
+  upload them to code versioning tools like Git and hosting platforms like
+  GitHub. Research best practices for private key management in order to avoid
+  loss of funds.
+</Note>
+
+The output of the command will look something like this:
+
+````
+Successfully created new keypair.
+Address:     0xB815A0c4bC23930119324d4359dB65e27A846A2d
+Private key: 0xcc1b30a6af68ea9a9917f1dda20c927704c5cdb2bbe0076901a8a0e40bf997c5
+```
+
+## Fund your wallet
+
+Now that you have a wallet, you need to fund it with some World Chain Sepolia ETH. You can get some World Chain Sepolia ETH from the [World Chain Sepolia faucet](https://www.alchemy.com/faucets/world-chain-sepolia) operated by Alchemy.
+In the form on the faucet page, enter the address of your wallet which you generated above and click the "Send me ETH" button. If you have any issues please send us a message in the developer
+group chat on [Telegram](https://t.me/worldcoindevelopers) or [Discord](https://world.org/discord).
+
+## Deploy the contract
+
+Now that you have a wallet and you funded it with World Chain Sepolia ETH, you can deploy the `HelloWorldChain` contract to World Chain Sepolia using the following `forge create` command:
+
+<CodeGroup>
+  ```bash Deploy the contract forge create
+  src/HelloWorldChain.sol:HelloWorldChain --rpc-url
+  https://worldchain-sepolia.g.alchemy.com/public --private-key
+  0xcc1b30a6af68ea9a9917f1dda20c927704c5cdb2bbe0076901a8a0e40bf997c5 ```
+</CodeGroup>
+
+Here, we are using the `<path>:<contractname>` format to specify the contract. This tells Foundry where to find the contract file (src/HelloWorldChain.sol) and which contract within the file (HelloWorldChain) to deploy.
+We also use the `--rpc-url` flag to specify the RPC URL of the World Chain Sepolia network and the `--private-key` flag to specify the private key of the wallet we generated earlier.
+On top of this we can also provide other flags like `-vvvvv` to get more verbose output from the deployment process, `--verify` to verify the contract on [Worldscan](https://worldscan.org) or [Blockscout](https://worldchain-sepolia.explorer.alchemy.com/) (alongside with an `--etherscan-api-key` flag) and
+several other flags to toggle different features that you can find more about in the [Foundry documentation](https://book.getfoundry.sh/).
+
+And that's it! You have successfully deployed a smart contract to World Chain Sepolia. You can interact with the contract using `forge script` scripts, using a block explorer or any other EVM library like [ethers.js](https://docs.ethers.io/v5/), [alloy-rs](https://github.com/alloy-rs/alloy/), and many others.
+````
+
+# Deploy a World ID Template App
+
+> Deploy the World ID on-chain template to a World Chain Sepolia fork with Foundry; configure env, contracts, and local web.
+
+In this tutorial we are going to deploy a [World ID template app](https://github.com/worldcoin/world-id-onchain-template) on a World Chain Sepolia local fork using anvil.
+This app will be a simple web application that allows users to create a World ID proof of personhood and verify it.
+The app will be deployed on World Chain Sepolia and will interact with the `WorldIDRouter` smart contract
+to verify the ZK proofs of personhood.
+
+## Prerequisites
+
+Before we start, make sure you have the following tools installed:
+
+* [Git](https://git-scm.com/) (usually pre-installed on most systems)
+* [Node.js](https://nodejs.org/en/)
+* [pnpm](https://yarnpkg.com/) (or equivalent like npm, yarn or bun)
+* [Foundry CLI](https://book.getfoundry.sh/)
+
+## Clone template
+
+First, clone the World ID template app repository from GitHub:
+
+```bash  theme={null}
+git clone https://github.com/worldcoin/world-id-onchain-template.git && cd world-id-onchain-template
+```
+
+## Install dependencies
+
+Next, install the dependencies for the World ID template app:
+
+```bash  theme={null}
+pnpm install
+```
+
+## Build the smart contracts
+
+Next we are going to compile the smart contracts for the World ID template app:
+
+```bash  theme={null}
+cd contracts && forge build
+```
+
+## Understanding World ID
+
+Before we deploy the World ID template app, let's take a look at the smart contracts that are part of the app:
+
+<CodeGroup>
+  ```solidity contracts/src/Contract.sol theme={null}
+  // SPDX-License-Identifier: MIT
+  pragma solidity ^0.8.13;
+
+  import { ByteHasher } from "./helpers/ByteHasher.sol";
+  import { IWorldID } from "./interfaces/IWorldID.sol";
+
+  contract Contract {
+  using ByteHasher for bytes;
+
+      ///////////////////////////////////////////////////////////////////////////////
+      ///                                  ERRORS                                ///
+      //////////////////////////////////////////////////////////////////////////////
+
+      /// @notice Thrown when attempting to reuse a nullifier
+      error DuplicateNullifier(uint256 nullifierHash);
+
+      /// @dev The World ID instance that will be used for verifying proofs
+      IWorldID internal immutable worldId;
+
+      /// @dev The contract's external nullifier hash
+      uint256 internal immutable externalNullifier;
+
+      /// @dev The World ID group ID (always 1)
+      uint256 internal immutable groupId = 1;
+
+      /// @dev Whether a nullifier hash has been used already. Used to guarantee an action is only performed once by a single person
+      mapping(uint256 => bool) internal nullifierHashes;
+
+      /// @param nullifierHash The nullifier hash for the verified proof
+      /// @dev A placeholder event that is emitted when a user successfully verifies with World ID
+      event Verified(uint256 nullifierHash);
+
+      /// @param _worldId The WorldID router that will verify the proofs
+      /// @param _appId The World ID app ID
+      /// @param _actionId The World ID action ID
+      constructor(IWorldID _worldId, string memory _appId, string memory _actionId) {
+      	worldId = _worldId;
+      	externalNullifier = abi.encodePacked(abi.encodePacked(_appId).hashToField(), _actionId).hashToField();
+      }
+
+      /// @param signal An arbitrary input from the user, usually the user's wallet address (check README for further details)
+      /// @param root The root of the Merkle tree (returned by the JS widget).
+      /// @param nullifierHash The nullifier hash for this proof, preventing double signaling (returned by the JS widget).
+      /// @param proof The zero-knowledge proof that demonstrates the claimer is registered with World ID (returned by the JS widget).
+      /// @dev Feel free to rename this method however you want! We've used `claim`, `verify` or `execute` in the past.
+      function verifyAndExecute(address signal, uint256 root, uint256 nullifierHash, uint256[8] calldata proof) public {
+      	// First, we make sure this person hasn't done this before
+      	if (nullifierHashes[nullifierHash]) revert DuplicateNullifier(nullifierHash);
+
+      	// We now verify the provided proof is valid and the user is verified by World ID
+      	worldId.verifyProof(
+      		root,
+      		groupId,
+      		abi.encodePacked(signal).hashToField(),
+      		nullifierHash,
+      		externalNullifier,
+      		proof
+      	);
+
+      	// We now record that the user has done this, so they can't do it again (proof of uniqueness)
+      	nullifierHashes[nullifierHash] = true;
+
+      	// Finally, execute your logic here, for example issue a token, NFT, etc...
+      	// Make sure to emit some kind of event afterwards!
+
+      	emit Verified(nullifierHash);
+      }
+
+  }
+
+  ```
+</CodeGroup>
+
+This contract has all the necessary pieces that any app that wants to integrate World ID proofs of personhood will require.
+The World ID docs have a [detailed explanation](https://docs.worldcoin.org/world-id) of how the World ID system works and how to integrate it into your app.
+But we will go over the main parts of the contract here:
+
+1. The `Contract` contract is the main contract that will be deployed to World Chain Sepolia. It has a constructor that
+   takes the `IWorldID` interface, the app ID and the action ID as parameters. The `IWorldID` interface is the World ID router
+   that will verify the proofs, the app ID is the ID of the app can be created by the developer using the
+   [World ID Developer Portal](https://developer.worldcoin.org/login) and that the action ID is the ID of the action that the user
+   is performing which will be generated automatically by the [IDKit SDK](https://docs.worldcoin.org/reference/idkit) and derived
+   from `action` string defined in the Developer Portal.
+2. The [`nullifierHashes` mapping](https://docs.worldcoin.org/reference/contracts#sybil-resistance) is used to keep track of
+   the nullifier hashes that have been used already. This is used to guarantee that an action is only performed once by a single
+   person in order to achieve sybil resistance.
+3. The `verifyAndExecute` function is the main function that will be called by the user to verify their proof of personhood.
+   It takes the user's wallet address, the root of the Merkle tree, the nullifier hash, and the proof as parameters.
+4. The function first checks if the nullifier hash has been used already and reverts if it has.
+5. It then verifies the proof using the `worldId.verifyProof` function which is part of the `IWorldID` interface.
+6. If the proof is valid, the function records the nullifier hash and executes the logic of the app. In this case, it emits
+   the `Verified` event.
+
+If you want an example of a production application which uses the World ID protocol, you can check out the
+[Worldcoin grants contracts](https://github.com/worldcoin/worldcoin-grants-contracts).
+Specifically, the [`RecurringGrantDrop.sol`](https://github.com/worldcoin/worldcoin-grants-contracts/blob/main/src/RecurringGrantDrop.sol)
+contract which uses the World ID protocol to verify that the user is a unique human before they can claim a grant.
+
+## Deploy template app
+
+First, you have to go to a node provider that supports World Chain Sepolia. You can use [Alchemy](https://www.alchemy.com/)
+or any of the other providers listed in the [World Chain documentation](/world-chain/providers/nodes). Once you have a node provider
+account, you need to get an RPC URL for the World Chain Sepolia network. For a simple deployment, the public RPC URL is sufficient.
+However, for doing a fork deployment, you will need to run a local fork of World Chain Sepolia using anvil which requires higher
+requirements on the RPC provider for forking the network.
+
+First, we will fork the World Chain Sepolia network using anvil:
+
+```bash  theme={null}
+# Substitute the RPC_URL with the RPC URL of the World Chain Sepolia network
+anvil -f $RPC_URL
+```
+
+We also need to set three important environment variables that are required for the deployment of the World ID template app:
+
+* `WORLD_ID_ROUTER`: The address of the World ID router contract that will verify the proofs (can be found in the [World ID documentation](https://docs.worldcoin.org/world-chain/reference/useful-contracts))
+* `NEXT_PUBLIC_APP_ID`: The app ID that was generated in the [Developer Portal](https://developer.worldcoin.org/login)
+* `NEXT_PUBLIC_ACTION`: The action ID as configured in the [Developer Portal](https://developer.worldcoin.org/login)
+
+Once the fork is running, you can deploy the World ID template app to the World Chain Sepolia network using the Foundry CLI:
+
+```bash  theme={null}
+# cd into the contracts directory
+cd contracts
+forge create --rpc-url http://localhost:8545 --private-key 0xac0974bec39a17e36ba4a6b4d238ff944bacb478cbed5efcae784d7bf4f2ff80 src/Contract.sol:Contract --constructor-args $WORLD_ID_ROUTER $NEXT_PUBLIC_APP_ID $NEXT_PUBLIC_ACTION
+```
+
+This command will deploy the `Contract` contract to the World Chain Sepolia network using the provided RPC URL and private key.
+
+## Local Web Setup
+
+Set up your environment variables in the `.env` file. You will need to set the following variables:
+
+* `NEXT_PUBLIC_APP_ID`: The app ID as configured in the [Worldcoin Developer Portal](https://developer.worldcoin.org).
+* `NEXT_PUBLIC_ACTION`: The action ID as configured in the Worldcoin Developer Portal.
+* `NEXT_PUBLIC_WALLETCONNECT_ID`: Your WalletConnect ID.
+* `NEXT_PUBLIC_CONTRACT_ADDRESS`: The address of the contract deployed in the previous step.
+
+Back in the root directory of the World ID template app, you can start the local web server:
+
+```bash  theme={null}
+pnpm dev
+```
+
+The Contract ABI will be automatically re-generated and saved to `src/abi/ContractAbi.json` on each run of `pnpm dev`.
+
+## Iterating
+
+After making changes to the contract, you should:
+
+* re-run the `forge create` command from above
+* replace the `NEXT_PUBLIC_CONTRACT_ADDRESS` environment variable with the new contract address
+* if your contract ABI has changed, restart the local web server
+
+## Testing
+
+You'll need to import the private keys on the local testnet into your wallet used for local development. The default development seed phrase is `test test test test test test test test test test test junk`.
+
+<Note>
+  This is only for local development. Do not use this seed phrase on mainnet or
+  any public testnet.
+</Note>
+
+When connecting your wallet to the local development environment, you will be prompted to add the network to your wallet.
+
+Use the [Worldcoin Simulator](https://simulator.worldcoin.org) in place of World App to scan the IDKit QR codes and generate the zero-knowledge proofs.
+
+## Further resources
+
+If you want to learn more about the World ID protocol, you can check out the [World ID documentation](/world-id). If you want to build an application
+that uses World ID and targets existing World App users, check out [miniapps](/mini-apps)!
+
+# World Chain Contracts
+
+## World Chain Mainnet
+
+<table>
+  <thead>
+    <tr>
+      <th className="p-2 text-left align-middle">Name</th>
+      <th className="p-2 text-left align-middle">Address</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <tr>
+      <td className="p-2 align-middle">L2ToL1MessagePasser</td>
+      <td className="p-2 align-middle">[`0x4200000000000000000000000000000000000016`](https://worldscan.org/address/0x4200000000000000000000000000000000000016)</td>
+    </tr>
+
+    <tr>
+      <td className="p-2 align-middle">L2CrossDomainMessenger</td>
+      <td className="p-2 align-middle">[`0x4200000000000000000000000000000000000007`](https://worldscan.org/address/0x4200000000000000000000000000000000000007)</td>
+    </tr>
+
+    <tr>
+      <td className="p-2 align-middle">L2StandardBridge</td>
+      <td className="p-2 align-middle">[`0x4200000000000000000000000000000000000010`](https://worldscan.org/address/0x4200000000000000000000000000000000000010)</td>
+    </tr>
+
+    <tr>
+      <td className="p-2 align-middle">L2ERC721Bridge</td>
+      <td className="p-2 align-middle">[`0x4200000000000000000000000000000000000014`](https://worldscan.org/address/0x4200000000000000000000000000000000000014)</td>
+    </tr>
+
+    <tr>
+      <td className="p-2 align-middle">SequencerFeeVault</td>
+      <td className="p-2 align-middle">[`0x4200000000000000000000000000000000000011`](https://worldscan.org/address/0x4200000000000000000000000000000000000011)</td>
+    </tr>
+
+    <tr>
+      <td className="p-2 align-middle">OptimismMintableERC20Factory</td>
+      <td className="p-2 align-middle">[`0x4200000000000000000000000000000000000012`](https://worldscan.org/address/0x4200000000000000000000000000000000000012)</td>
+    </tr>
+
+    <tr>
+      <td className="p-2 align-middle">OptimismMintableERC721Factory</td>
+      <td className="p-2 align-middle">[`0x4200000000000000000000000000000000000017`](https://worldscan.org/address/0x4200000000000000000000000000000000000017)</td>
+    </tr>
+
+    <tr>
+      <td className="p-2 align-middle">L1Block</td>
+      <td className="p-2 align-middle">[`0x4200000000000000000000000000000000000015`](https://worldscan.org/address/0x4200000000000000000000000000000000000015)</td>
+    </tr>
+
+    <tr>
+      <td className="p-2 align-middle">GasPriceOracle</td>
+      <td className="p-2 align-middle">[`0x420000000000000000000000000000000000000F`](https://worldscan.org/address/0x420000000000000000000000000000000000000F)</td>
+    </tr>
+
+    <tr>
+      <td className="p-2 align-middle">ProxyAdmin</td>
+      <td className="p-2 align-middle">[`0x4200000000000000000000000000000000000018`](https://worldscan.org/address/0x4200000000000000000000000000000000000018)</td>
+    </tr>
+
+    <tr>
+      <td className="p-2 align-middle">BaseFeeVault</td>
+      <td className="p-2 align-middle">[`0x4200000000000000000000000000000000000019`](https://worldscan.org/address/0x4200000000000000000000000000000000000019)</td>
+    </tr>
+
+    <tr>
+      <td className="p-2 align-middle">L1FeeVault</td>
+      <td className="p-2 align-middle">[`0x420000000000000000000000000000000000001A`](https://worldscan.org/address/0x420000000000000000000000000000000000001A)</td>
+    </tr>
+
+    <tr>
+      <td className="p-2 align-middle">GovernanceToken</td>
+      <td className="p-2 align-middle">[`0x4200000000000000000000000000000000000042`](https://worldscan.org/address/0x4200000000000000000000000000000000000042)</td>
+    </tr>
+
+    <tr>
+      <td className="p-2 align-middle">SchemaRegistry</td>
+      <td className="p-2 align-middle">[`0x4200000000000000000000000000000000000020`](https://worldscan.org/address/0x4200000000000000000000000000000000000020)</td>
+    </tr>
+
+    <tr>
+      <td className="p-2 align-middle">EAS</td>
+      <td className="p-2 align-middle">[`0x4200000000000000000000000000000000000021`](https://worldscan.org/address/0x4200000000000000000000000000000000000021)</td>
+    </tr>
+  </tbody>
+</table>
+
+## Ethereum Mainnet
+
+<table>
+  <thead>
+    <tr>
+      <th className="p-2 text-left align-middle">Name</th>
+      <th className="p-2 text-left align-middle">Address</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <tr>
+      <td className="p-2 align-middle">AnchorStateRegistryProxy</td>
+      <td className="p-2 align-middle">[`0xD4D7A57DCC563756DeD99e224E144A6Bf0327099`](https://etherscan.io/address/0xD4D7A57DCC563756DeD99e224E144A6Bf0327099)</td>
+    </tr>
+
+    <tr>
+      <td className="p-2 align-middle">Batch Submitter</td>
+      <td className="p-2 align-middle">[`0xdBBE3D8c2d2b22A2611c5A94A9a12C2fCD49Eb29`](https://etherscan.io/address/0xdBBE3D8c2d2b22A2611c5A94A9a12C2fCD49Eb29)</td>
+    </tr>
+
+    <tr>
+      <td className="p-2 align-middle">Challenger</td>
+      <td className="p-2 align-middle">[`0xA4fB12D15Eb85dc9284a7df0AdBC8B696EdbbF1d`](https://etherscan.io/address/0xA4fB12D15Eb85dc9284a7df0AdBC8B696EdbbF1d)</td>
+    </tr>
+
+    <tr>
+      <td className="p-2 align-middle">DelayedWETHProxy</td>
+      <td className="p-2 align-middle">[`0xF9adF7c9502C5C60352C20a4d22683422DbD061F`](https://etherscan.io/address/0xF9adF7c9502C5C60352C20a4d22683422DbD061F)</td>
+    </tr>
+
+    <tr>
+      <td className="p-2 align-middle">DisputeGameFactoryProxy</td>
+      <td className="p-2 align-middle">[`0x069c4c579671f8c120b1327a73217D01Ea2EC5ea`](https://etherscan.io/address/0x069c4c579671f8c120b1327a73217D01Ea2EC5ea)</td>
+    </tr>
+
+    <tr>
+      <td className="p-2 align-middle">L1CrossDomainMessengerProxy</td>
+      <td className="p-2 align-middle">[`0xf931a81D18B1766d15695ffc7c1920a62b7e710a`](https://etherscan.io/address/0xf931a81D18B1766d15695ffc7c1920a62b7e710a)</td>
+    </tr>
+
+    <tr>
+      <td className="p-2 align-middle">L1ERC721BridgeProxy</td>
+      <td className="p-2 align-middle">[`0x1Df436AfDb2fBB40F1fE8bEd4Fc89A0D0990a8E9`](https://etherscan.io/address/0x1Df436AfDb2fBB40F1fE8bEd4Fc89A0D0990a8E9)</td>
+    </tr>
+
+    <tr>
+      <td className="p-2 align-middle">L1StandardBridgeProxy</td>
+      <td className="p-2 align-middle">[`0x470458C91978D2d929704489Ad730DC3E3001113`](https://etherscan.io/address/0x470458C91978D2d929704489Ad730DC3E3001113)</td>
+    </tr>
+
+    <tr>
+      <td className="p-2 align-middle">L2OutputOracleProxy</td>
+      <td className="p-2 align-middle">[`0x19A6d1E9034596196295CF148509796978343c5D`](https://etherscan.io/address/0x19A6d1E9034596196295CF148509796978343c5D)</td>
+    </tr>
+
+    <tr>
+      <td className="p-2 align-middle">MIPS</td>
+      <td className="p-2 align-middle">[`0x16e83cE5Ce29BF90AD9Da06D2fE6a15d5f344ce4`](https://etherscan.io/address/0x16e83cE5Ce29BF90AD9Da06D2fE6a15d5f344ce4)</td>
+    </tr>
+
+    <tr>
+      <td className="p-2 align-middle">OptimismMintableERC20FactoryProxy</td>
+      <td className="p-2 align-middle">[`0x82Cb528466cF22412d89bdBE9bCF04856790dD0e`](https://etherscan.io/address/0x82Cb528466cF22412d89bdBE9bCF04856790dD0e)</td>
+    </tr>
+
+    <tr>
+      <td className="p-2 align-middle">OptimismPortalProxy</td>
+      <td className="p-2 align-middle">[`0xd5ec14a83B7d95BE1E2Ac12523e2dEE12Cbeea6C`](https://etherscan.io/address/0xd5ec14a83B7d95BE1E2Ac12523e2dEE12Cbeea6C)</td>
+    </tr>
+
+    <tr>
+      <td className="p-2 align-middle">PermissionedDisputeGame</td>
+      <td className="p-2 align-middle">[`0x48cf980849a7eEA03180f7dea4E21C112097b03E`](https://etherscan.io/address/0x48cf980849a7eEA03180f7dea4E21C112097b03E)</td>
+    </tr>
+
+    <tr>
+      <td className="p-2 align-middle">PreimageOracle</td>
+      <td className="p-2 align-middle">[`0x9c065e11870B891D214Bc2Da7EF1f9DDFA1BE277`](https://etherscan.io/address/0x9c065e11870B891D214Bc2Da7EF1f9DDFA1BE277)</td>
+    </tr>
+
+    <tr>
+      <td className="p-2 align-middle">ProtocolVersionsProxy</td>
+      <td className="p-2 align-middle">[`0x8eeF04eef96fef1050702453f75F0Fc4f8F70973`](https://etherscan.io/address/0x8eeF04eef96fef1050702453f75F0Fc4f8F70973)</td>
+    </tr>
+
+    <tr>
+      <td className="p-2 align-middle">ProxyAdmin</td>
+      <td className="p-2 align-middle">[`0xd7405BE7f3e63b094Af6C7C23D5eE33Fd82F872D`](https://etherscan.io/address/0xd7405BE7f3e63b094Af6C7C23D5eE33Fd82F872D)</td>
+    </tr>
+
+    <tr>
+      <td className="p-2 align-middle">SafeProxyFactory</td>
+      <td className="p-2 align-middle">[`0xa6B71E26C5e0845f74c812102Ca7114b6a896AB2`](https://etherscan.io/address/0xa6B71E26C5e0845f74c812102Ca7114b6a896AB2)</td>
+    </tr>
+
+    <tr>
+      <td className="p-2 align-middle">SuperchainConfigProxy</td>
+      <td className="p-2 align-middle">[`0x95703e0982140D16f8ebA6d158FccEde42f04a4C`](https://etherscan.io/address/0x95703e0982140D16f8ebA6d158FccEde42f04a4C)</td>
+    </tr>
+
+    <tr>
+      <td className="p-2 align-middle">SystemConfigProxy</td>
+      <td className="p-2 align-middle">[`0x6ab0777fD0e609CE58F939a7F70Fe41F5Aa6300A`](https://etherscan.io/address/0x6ab0777fD0e609CE58F939a7F70Fe41F5Aa6300A)</td>
+    </tr>
+
+    <tr>
+      <td className="p-2 align-middle">OpUSDCBridgeAdapter</td>
+      <td className="p-2 align-middle">[`0x153A69e4bb6fEDBbAaF463CB982416316c84B2dB`](https://etherscan.io/address/0x153A69e4bb6fEDBbAaF463CB982416316c84B2dB)</td>
+    </tr>
+  </tbody>
+</table>
+
+## World Chain Sepolia Testnet
+
+<table>
+  <thead>
+    <tr>
+      <th className="p-2 text-left align-middle">Name</th>
+      <th className="p-2 text-left align-middle">Address</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <tr>
+      <td className="p-2 align-middle">L2ToL1MessagePasser</td>
+      <td className="p-2 align-middle">[`0x4200000000000000000000000000000000000016`](https://worldchain-sepolia.explorer.alchemy.com/address/0x4200000000000000000000000000000000000016)</td>
+    </tr>
+
+    <tr>
+      <td className="p-2 align-middle">L2CrossDomainMessenger</td>
+      <td className="p-2 align-middle">[`0x4200000000000000000000000000000000000007`](https://worldchain-sepolia.explorer.alchemy.com/address/0x4200000000000000000000000000000000000007)</td>
+    </tr>
+
+    <tr>
+      <td className="p-2 align-middle">L2StandardBridge</td>
+      <td className="p-2 align-middle">[`0x4200000000000000000000000000000000000010`](https://worldchain-sepolia.explorer.alchemy.com/address/0x4200000000000000000000000000000000000010)</td>
+    </tr>
+
+    <tr>
+      <td className="p-2 align-middle">L2ERC721Bridge</td>
+      <td className="p-2 align-middle">[`0x4200000000000000000000000000000000000014`](https://worldchain-sepolia.explorer.alchemy.com/address/0x4200000000000000000000000000000000000014)</td>
+    </tr>
+
+    <tr>
+      <td className="p-2 align-middle">SequencerFeeVault</td>
+      <td className="p-2 align-middle">[`0x4200000000000000000000000000000000000011`](https://worldchain-sepolia.explorer.alchemy.com/address/0x4200000000000000000000000000000000000011)</td>
+    </tr>
+
+    <tr>
+      <td className="p-2 align-middle">OptimismMintableERC20Factory</td>
+      <td className="p-2 align-middle">[`0x4200000000000000000000000000000000000012`](https://worldchain-sepolia.explorer.alchemy.com/address/0x4200000000000000000000000000000000000012)</td>
+    </tr>
+
+    <tr>
+      <td className="p-2 align-middle">OptimismMintableERC721Factory</td>
+      <td className="p-2 align-middle">[`0x4200000000000000000000000000000000000017`](https://worldchain-sepolia.explorer.alchemy.com/address/0x4200000000000000000000000000000000000017)</td>
+    </tr>
+
+    <tr>
+      <td className="p-2 align-middle">L1Block</td>
+      <td className="p-2 align-middle">[`0x4200000000000000000000000000000000000015`](https://worldchain-sepolia.explorer.alchemy.com/address/0x4200000000000000000000000000000000000015)</td>
+    </tr>
+
+    <tr>
+      <td className="p-2 align-middle">GasPriceOracle</td>
+      <td className="p-2 align-middle">[`0x420000000000000000000000000000000000000F`](https://worldchain-sepolia.explorer.alchemy.com/address/0x420000000000000000000000000000000000000F)</td>
+    </tr>
+
+    <tr>
+      <td className="p-2 align-middle">ProxyAdmin</td>
+      <td className="p-2 align-middle">[`0x4200000000000000000000000000000000000018`](https://worldchain-sepolia.explorer.alchemy.com/address/0x4200000000000000000000000000000000000018)</td>
+    </tr>
+
+    <tr>
+      <td className="p-2 align-middle">BaseFeeVault</td>
+      <td className="p-2 align-middle">[`0x4200000000000000000000000000000000000019`](https://worldchain-sepolia.explorer.alchemy.com/address/0x4200000000000000000000000000000000000019)</td>
+    </tr>
+
+    <tr>
+      <td className="p-2 align-middle">L1FeeVault</td>
+      <td className="p-2 align-middle">[`0x420000000000000000000000000000000000001A`](https://worldchain-sepolia.explorer.alchemy.com/address/0x420000000000000000000000000000000000001A)</td>
+    </tr>
+
+    <tr>
+      <td className="p-2 align-middle">GovernanceToken</td>
+      <td className="p-2 align-middle">[`0x4200000000000000000000000000000000000042`](https://worldchain-sepolia.explorer.alchemy.com/address/0x4200000000000000000000000000000000000042)</td>
+    </tr>
+
+    <tr>
+      <td className="p-2 align-middle">SchemaRegistry</td>
+      <td className="p-2 align-middle">[`0x4200000000000000000000000000000000000020`](https://worldchain-sepolia.explorer.alchemy.com/address/0x4200000000000000000000000000000000000020)</td>
+    </tr>
+
+    <tr>
+      <td className="p-2 align-middle">EAS</td>
+      <td className="p-2 align-middle">[`0x4200000000000000000000000000000000000021`](https://worldchain-sepolia.explorer.alchemy.com/address/0x4200000000000000000000000000000000000021)</td>
+    </tr>
+  </tbody>
+</table>
+
+## Ethereum Sepolia Testnet
+
+<table>
+  <thead>
+    <tr>
+      <th className="p-2 text-left align-middle">Name</th>
+      <th className="p-2 text-left align-middle">Address</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <tr>
+      <td className="p-2 align-middle">AnchorStateRegistryProxy</td>
+      <td className="p-2 align-middle">[`0x1333d5E5201D760444A399E77b3D337eBDB0DD07`](https://sepolia.etherscan.io/address/0x1333d5E5201D760444A399E77b3D337eBDB0DD07)</td>
+    </tr>
+
+    <tr>
+      <td className="p-2 align-middle">Batch Submitter</td>
+      <td className="p-2 align-middle">[`0x0f3ff4731D7a10B89ED79AD1Fd97844d7F66B96d`](https://sepolia.etherscan.io/address/0x0f3ff4731D7a10B89ED79AD1Fd97844d7F66B96d)</td>
+    </tr>
+
+    <tr>
+      <td className="p-2 align-middle">Challenger</td>
+      <td className="p-2 align-middle">[`0x945185C01fb641bA3E63a9bdF66575e35a407837`](https://sepolia.etherscan.io/address/0x945185C01fb641bA3E63a9bdF66575e35a407837)</td>
+    </tr>
+
+    <tr>
+      <td className="p-2 align-middle">DelayedWETHProxy</td>
+      <td className="p-2 align-middle">[`0x4F4B8Adf1af4b61bb62F68b7aF1c37f8A6311663`](https://sepolia.etherscan.io/address/0x4F4B8Adf1af4b61bb62F68b7aF1c37f8A6311663)</td>
+    </tr>
+
+    <tr>
+      <td className="p-2 align-middle">DisputeGameFactoryProxy</td>
+      <td className="p-2 align-middle">[`0x8Ec1111f67Dad6b6A93B3F42DfBC92D81c98449A`](https://sepolia.etherscan.io/address/0x8Ec1111f67Dad6b6A93B3F42DfBC92D81c98449A)</td>
+    </tr>
+
+    <tr>
+      <td className="p-2 align-middle">L1CrossDomainMessengerProxy</td>
+      <td className="p-2 align-middle">[`0x7768c821200554d8F359A8902905Ba9eDe5659a9`](https://sepolia.etherscan.io/address/0x7768c821200554d8F359A8902905Ba9eDe5659a9)</td>
+    </tr>
+
+    <tr>
+      <td className="p-2 align-middle">L1ERC721BridgeProxy</td>
+      <td className="p-2 align-middle">[`0x3580505c56f8560E3777E92Fb27f70fD20c5B493`](https://sepolia.etherscan.io/address/0x3580505c56f8560E3777E92Fb27f70fD20c5B493)</td>
+    </tr>
+
+    <tr>
+      <td className="p-2 align-middle">L1StandardBridgeProxy</td>
+      <td className="p-2 align-middle">[`0xd7DF54b3989855eb66497301a4aAEc33Dbb3F8DE`](https://sepolia.etherscan.io/address/0xd7DF54b3989855eb66497301a4aAEc33Dbb3F8DE)</td>
+    </tr>
+
+    <tr>
+      <td className="p-2 align-middle">L2OutputOracleProxy</td>
+      <td className="p-2 align-middle">[`0xc8886f8BAb6Eaeb215aDB5f1c686BF699248300e`](https://sepolia.etherscan.io/address/0xc8886f8BAb6Eaeb215aDB5f1c686BF699248300e)</td>
+    </tr>
+
+    <tr>
+      <td className="p-2 align-middle">MIPS</td>
+      <td className="p-2 align-middle">[`0x69470D6970Cd2A006b84B1d4d70179c892cFCE01`](https://sepolia.etherscan.io/address/0x69470D6970Cd2A006b84B1d4d70179c892cFCE01)</td>
+    </tr>
+
+    <tr>
+      <td className="p-2 align-middle">OptimismMintableERC20FactoryProxy</td>
+      <td className="p-2 align-middle">[`0x2D272eF54Ee8EF5c2Ff3523559186580b158cd57`](https://sepolia.etherscan.io/address/0x2D272eF54Ee8EF5c2Ff3523559186580b158cd57)</td>
+    </tr>
+
+    <tr>
+      <td className="p-2 align-middle">OptimismPortalProxy</td>
+      <td className="p-2 align-middle">[`0xFf6EBa109271fe6d4237EeeD4bAb1dD9A77dD1A4`](https://sepolia.etherscan.io/address/0xFf6EBa109271fe6d4237EeeD4bAb1dD9A77dD1A4)</td>
+    </tr>
+
+    <tr>
+      <td className="p-2 align-middle">PermissionedDisputeGame</td>
+      <td className="p-2 align-middle">[`0x552334Bf0B124bD89BFF744f33Ca7e49d44a80Ac`](https://sepolia.etherscan.io/address/0x552334Bf0B124bD89BFF744f33Ca7e49d44a80Ac)</td>
+    </tr>
+
+    <tr>
+      <td className="p-2 align-middle">PreimageOracle</td>
+      <td className="p-2 align-middle">[`0x92240135b46fc1142dA181f550aE8f595B858854`](https://sepolia.etherscan.io/address/0x92240135b46fc1142dA181f550aE8f595B858854)</td>
+    </tr>
+
+    <tr>
+      <td className="p-2 align-middle">ProtocolVersionsProxy</td>
+      <td className="p-2 align-middle">[`0x01DBC9aBe8e59f021d47Cf79143DE830820CbA29`](https://sepolia.etherscan.io/address/0x01DBC9aBe8e59f021d47Cf79143DE830820CbA29)</td>
+    </tr>
+
+    <tr>
+      <td className="p-2 align-middle">ProxyAdmin</td>
+      <td className="p-2 align-middle">[`0x3a987FE1cb587B0A1808cf9bB7Cbe0E341838319`](https://sepolia.etherscan.io/address/0x3a987FE1cb587B0A1808cf9bB7Cbe0E341838319)</td>
+    </tr>
+
+    <tr>
+      <td className="p-2 align-middle">SafeProxyFactory</td>
+      <td className="p-2 align-middle">[`0xa6B71E26C5e0845f74c812102Ca7114b6a896AB2`](https://sepolia.etherscan.io/address/0xa6B71E26C5e0845f74c812102Ca7114b6a896AB2)</td>
+    </tr>
+
+    <tr>
+      <td className="p-2 align-middle">SuperchainConfigProxy</td>
+      <td className="p-2 align-middle">[`0xC2Be75506d5724086DEB7245bd260Cc9753911Be`](https://sepolia.etherscan.io/address/0xC2Be75506d5724086DEB7245bd260Cc9753911Be)</td>
+    </tr>
+
+    <tr>
+      <td className="p-2 align-middle">SystemConfigProxy</td>
+      <td className="p-2 align-middle">[`0x166F9406e79A656f12F05247fb8F5DfA6155bCBF`](https://sepolia.etherscan.io/address/0x166F9406e79A656f12F05247fb8F5DfA6155bCBF)</td>
+    </tr>
+  </tbody>
+</table>
+
+# Transaction Fees
+
+> Understand World Chain fees: L2 execution vs L1 security costs, variability, and ways to optimize gas.
+
+Every World Chain transaction consists of two costs: an L2 (execution) fee and an L1 (security) fee. The L2 fee is the cost to execute your transaction on the L2, while the L1 fee covers the estimated cost of publishing the transaction on the L1. Typically, the L1 security fee is higher than the L2 execution fee.
+
+The L1 fee fluctuates depending on the volume of transactions on the L1. If your transaction timing is flexible, you can save on costs by submitting during periods of lower gas fees on the L1 (for example, weekends) or using products like [GasHawk](https://gashawk.io/) which schedule transactions during periods of low demand.
+
+Similarly, the L2 fee can vary based on the number of transactions submitted to the L2. This dynamic adjustment works similarly to the L1; you can learn more about it [here](https://blog.thirdweb.com/eip-1559-ethereum-gas-fees/).
+
+For additional details about fee calculation on World Chain, please refer to the relevant [op-stack developer documentation](https://docs.optimism.io/stack/transactions/fees).
+
+# EVM Equivalence
+
+> How World Chain achieves EVM equivalence via OP Stack, plus key parameter differences vs OP Mainnet and Ethereum.
+
+World Chain is EVM-equivalent because it utilizes the [OP Stack](https://docs.optimism.io/stack/getting-started), a modular framework developed by Optimism,
+which ensures compatibility with the [Ethereum Virtual Machine (EVM)](https://ethereum.org/en/developers/docs/evm/). By leveraging the OP Stack,
+World Chain can execute smart contracts and interact with decentralized applications designed for Ethereum
+without any modifications. This equivalency enables seamless interoperability with Ethereum's ecosystem of applications and protocols.
+The OP Stack's modularity also allows World Chain to implement scaling solutions and other customizations while maintaining the fundamental EVM equivalence,
+ensuring a flexible yet consistent environment for developers and users alike.
+
+## Differences between World Chain, OP Mainnet and Ethereum
+
+Though the EVM remains unchanged across OP Stack (Superchain) chains compared to the Ethereum layer 1, there are some configurations of the execution clients that
+do differ.
+
+<table>
+  <thead>
+    <tr>
+      <th className="p-2 text-left align-middle">Parameter</th>
+      <th className="p-2 text-left align-middle">World Chain</th>
+      <th className="p-2 text-left align-middle">OP Mainnet</th>
+      <th className="p-2 text-left align-middle">Ethereum</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    <tr>
+      <td className="p-2 align-middle">Block time in seconds</td>
+      <td className="p-2 align-middle">2</td>
+      <td className="p-2 align-middle">2</td>
+      <td className="p-2 align-middle">12</td>
+    </tr>
+
+    <tr>
+      <td className="p-2 align-middle">Block gas limit</td>
+      <td className="p-2 align-middle">30,000,000</td>
+      <td className="p-2 align-middle">30,000,000</td>
+      <td className="p-2 align-middle">30,000,000</td>
+    </tr>
+
+    <tr>
+      <td className="p-2 align-middle">Block gas target</td>
+      <td className="p-2 align-middle">10,000,000</td>
+      <td className="p-2 align-middle">5,000,000</td>
+      <td className="p-2 align-middle">15,000,000</td>
+    </tr>
+
+    <tr>
+      <td className="p-2 align-middle">EIP-1559 elasticity multiplier</td>
+      <td className="p-2 align-middle">6</td>
+      <td className="p-2 align-middle">6</td>
+      <td className="p-2 align-middle">2</td>
+    </tr>
+
+    <tr>
+      <td className="p-2 align-middle">EIP-1559 denominator</td>
+      <td className="p-2 align-middle">250</td>
+      <td className="p-2 align-middle">250</td>
+      <td className="p-2 align-middle">8</td>
+    </tr>
+
+    <tr>
+      <td className="p-2 align-middle">
+        Maximum base fee increase (per block)
+      </td>
+
+      <td className="p-2 align-middle">0.8%</td>
+      <td className="p-2 align-middle">2%</td>
+      <td className="p-2 align-middle">12.5%</td>
+    </tr>
+
+    <tr>
+      <td className="p-2 align-middle">
+        Maximum base fee decrease (per block)
+      </td>
+
+      <td className="p-2 align-middle">0.4%</td>
+      <td className="p-2 align-middle">0.4%</td>
+      <td className="p-2 align-middle">12.5%</td>
+    </tr>
+  </tbody>
+</table>
+
+For more information check out the [OP Stack docs](https://docs.optimism.io/stack/getting-started).
+
+# Grants Program
+
+> Apply for Worldcoin Foundation grants: areas of interest, continuous grants program, and how to submit.
+
+The [Worldcoin Foundation](https://worldcoin.foundation) runs the [Human Collective Grants](https://world.org/community-grants) program
+which gives grants to builders that help accelerate the [Worldcoin Tech Tree](https://world.org/tech-tree) and [related RFPs](https://world.org/rfp).
+The grants program switched from a quarterly waves format to a continuous format where builders can apply for a grant at any point in time. For more information
+you can read the [Continuous Grants program announcement blogpost](https://world.org/blog/announcements/worldcoin-foundation-introduces-new-continuous-grants-program-spur-innovation).
+
+## Areas of interest for applications
+
+* Rustification of the [OP Stack](https://docs.optimism.io/stack/getting-started)
+* Futhering [the gigagas roadmap](https://www.google.com/url?q=https://www.paradigm.xyz/2024/04/reth-perf\&sa=D\&source=editors\&ust=1726507097184499\&usg=AOvVaw34fUyrLcoigheJlrfbIDM2)
+* ZK-ifying the OP Stack (efforts like [OP Succinct](https://blog.succinct.xyz/op-succinct/), [Zeth from Risc0](https://risczero.com/blog/zeth-release) and [Mina's ZK fault proof RFP]())
+* Scalability research and engineering (can be Ethereum core as well)
+* Embedding priority blockspace for humans into the OP Stack derivation pipeline + fault proof program (open R\&D)
+* Separate eip1559 fee market for humans on OP Stack
+* L2 Execution client development (especially [reth](https://github.com/paradigmxyz/reth)) and benchmarking
+* Improving UX and interoperability
+* Chain-level experiments with digital identity and the OP Stack (things like [human priority blockspace](/world-chain/quick-start/features#priority-blockspace-for-humans) and [free gas allowances](/world-chain/quick-start/features#gas-allowance-for-humans) for unique humans)
+* Interesting applications on World Chain (past examples include proof aggregators like [Nebra](https://nebra.one/), storage proofs like [Herodotus](https://herodotus.dev/) and [Axiom](https://www.axiom.xyz/), Passkeys module for Safe, and others)
+* and more...
+
+### If you are interested [apply here](https://airtable.com/appftNMpv819abvTc/pag0uKCtjQAPJgaEB/form) or send us an email to [grants@worldcoin.org](mailto:grants@worldcoin.org)!
+
+# Nodes
+
+## Alchemy
+
+[Alchemy](https://alchemy.com/) is a leading blockchain development platform that provides robust node provisioning services for Web3 applications on World Chain.
+Alchemy's node infrastructure services simplify the process of building, deploying, and scaling
+blockchain applications by providing developers with access to a network of nodes on an on-demand basis.
+
+For access to a World Chain node, check out the [World Chain Alchemy page](https://www.alchemy.com/world-chain).
+
+### Supported networks
+
+* World Chain
+* World Chain Sepolia
+
+## Blast API
+
+Blast API offers standardized blockchain API services for Web3 development, allowing users to generate dedicated endpoints (RPC/WSS/REST) for supported blockchain networks. The platform employs geographically distributed third-party nodes to ensure reliability, low latency, and decentralization.
+
+### Supported networks
+
+* World Chain
+
+## QuickNode
+
+Enterprise-grade infrastructure for World Chain development with global edge delivery. Build with high-performance RPC APIs, real-time data streaming/ETL capabilities, decentralized storage via IPFS, and extensive developer tools through our marketplace. Ideal for teams building production-grade applications on World Chain.
+
+QuickNode offers several benefits for developers building on World Chain, read more [here](https://quicknode.notion.site/QuickNode-Benefits-for-WorldChain-Developers-14b15a82e84c807ba912cc1a6a8a5c4a)!
+
+### Supported networks
+
+* [World Chain](https://www.quicknode.com/chains/worldchain)
+* [World Chain Sepolia](https://www.quicknode.com/chains/worldchain)
+* [Documentation](https://www.quicknode.com/chains/worldchain)
+
+## Tenderly RPC
+
+[Tenderly](https://tenderly.co/) is a blockchain development platform that provides tools for building, monitoring, and managing smart contracts on Ethereum and other EVM-compatible chains. They also provide node infrastructure services for World Chain.
+
+### Supported networks
+
+* World Chain
+* World Chain Sepolia
+
+# Bridges
+
+## Superchain Bridges
+
+The Superchain bridge is the native bridge for World Chain as it comes with the OP Stack smart contracts which power the network. There are several interface providers for this bridge and it allows users to bridge assets from Ethereum mainnet and onto World Chain and vice versa.
+
+### Superbridge Core
+
+[Superbridge.app](https://superbridge.app/world-chain) is a blockchain bridging platform that enables users to transfer Ethereum (ETH) and ERC20 tokens between different blockchain networks, primarily focusing on OP Stack Layer 2 rollups chains including the World Chain network.
+
+### Alchemy Bridge
+
+The [native bridge interface for World Chain mainnet](https://worldchain-mainnet.bridge.alchemy.com/) provided by [Alchemy](https://alchemy.com/) is the rollup as a service (RaaS) provider for World Chain. As part of this service it also provides a World Chain bridge interface for users to deposit to and withdraw assets from the network. There is also a [testnet bridge](https://worldchain-sepolia.bridge.alchemy.com/) available for developers and users to bridge assets to the World Chain Sepolia testnet.
+
+## Third-party bridges
+
+<Note>
+  Across is the recommended provider for bridging WLD between World Chain and other networks.
+</Note>
+
+### Across
+
+[Across](https://app.across.to/bridge?) is an intent-based cross-chain bridging protocol that allows users to transfer tokens between different blockchain networks, particularly focusing on Layer 2 solutions and Ethereum-compatible chains.
+
+### Brid.gg
+
+[Brid.gg](https://brid.gg/) facilitates cross-chain transactions and aims to improve interoperability between different blockchain networks. It primarily connects Ethereum Mainnet to OP Chains including World Chain, allowing for transfers of digital assets across various blockchains.
+
+### Superbridge fast
+
+[Superbridge Fast](https://superbridge.app/fast) is a service offered by Superbridge that allows users to deposit and withdraw assets to and from World Chain quickly using third party bridges like [Synapse](/world-chain/providers/bridges#synapse), [Across](/world-chain/providers/bridges#across), and [Hyperlane](/world-chain/providers/bridges#hyperlane) which are directly integrated with the Superchain bridge interface. This is the fastest way to bridge assets to and from World Chain.
+The next best method is to use the native Superchain bridge for which both Alchemy and Superbridge Core provide interfaces.
+
+### Synapse
+
+[Synapse](https://synapseprotocol.com/) is a cross-chain communication protocol that enables seamless asset transfers and messaging across different blockchain networks. It provides a secure and efficient infrastructure for interoperability, allowing users to move tokens and data between various chains without the need for centralized intermediaries.
+
+### Hyperlane
+
+[Hyperlane](https://hyperlane.xyz/) is an innovative interoperability protocol designed to facilitate seamless cross-chain communication and enable the development of interchain applications.
+
+Hyperlane provides permissionless infrastructure for sending arbitrary data between blockchains, allowing developers to create applications that can be accessed from any connected chain.
+It supports general asset transfers and custom cross-chain messaging, enabling users to interact with assets and applications across different networks including World Chain.
+
+### LayerZero
+
+[LayerZero](https://layerzero.network/) is an omnichain interoperability protocol that enables seamless communication between different blockchains.
+
+### Chainlink CCIP
+
+[Chainlink CCIP](https://chain.link/cross-chain) is a blockchain interoperability protocol that enables developers to build secure applications that can transfer tokens, messages (data), or both tokens and messages across chains.
+You can see World Chain-specific documentation for CCIP [here](https://docs.chain.link/ccip/directory/mainnet/chain/ethereum-mainnet-worldchain-1).
+
+### Thirdweb Universal Bridge
+
+Thirdweb's [Universal Bridge](https://portal.thirdweb.com/connect/pay/overview) is a comprehensive Web3 payment solution that allows your users to onramp, bridge, and swap on any EVM chain — with any EVM token or fiat — thanks to its automatic cross-chain routing.
+
+## Liquidity Layers
+
+### Cortex Protocol
+
+[Cortex Protocol](https://cortexprotocol.com/) is a decentralized, non-custodial liquidity protocol built on Ethereum that enables users to lend and borrow crypto assets. The protocol is designed to provide a secure and efficient platform for decentralized finance (DeFi) activities.
+
+# Data Indexing and Analytics
+
+Data indexing solutions and other APIs streamline access to blockchain data, enabling efficient querying and real-time analysis of on-chain events. This is crucial for decentralized applications built on World Chain, as it reduces the cost of processing, and presenting data. APIs also facilitate
+third-party integration, enhancing developer experiences and expanding the ecosystem with more accessible, decentralized apps (dApps) and services.
+
+## Allium
+
+[Allium](https://allium.so/) is an enterprise blockchain data platform designed to provide accurate, fast, and simple access to blockchain data across over 70 blockchains and more than 1,000 enriched schemas. It offers tools for developers and analysts to build real-time applications and perform cross-chain data exploration with low-latency APIs and customizable workflows.
+
+Allium features:
+
+* Low-Latency APIs
+* Data Freshness
+* Real-Time Data Streams
+* Decoded logs and traces
+
+### Supported networks
+
+* World Chain
+
+## Dune
+
+[Dune Analytics](https://dune.com/) is a blockchain data platform that enables users to query, visualize, and share insights from on-chain data.
+It provides a powerful interface for querying blockchain information using SQL-like queries, allowing users
+to create custom dashboards and visualizations.
+
+Dune's enhanced data accessibility and insights will give developers and non-developers on World Chain the
+ability to:
+
+* Explore metrics related to real humans interacting on the chain
+* Track the performance of DeFi protocols and DEXes
+* Explore onchain data of any public blockchain project
+
+With Dune's comprehensive dataset and web-based app, anyone (with a little SQL knowledge) may quickly query World Chain data and create insightful dashboards.
+
+For more data on [World](https://world.org/) and [World Chain](https://world.org/world-chain), visit the World Data Dashboards on Dune:
+
+* [World Chain](https://dune.com/blockchains/worldchain)
+* [World](https://dune.com/world/world)
+
+### Supported networks
+
+* World Chain
+
+## Zerion API
+
+[The Zerion API](https://zerion.io/api) can be used to build feature-rich web3 apps, wallets, and protocols with ease.
+Across all major blockchains, you can access wallets, assets, and chain data for web3 portfolios.
+
+### Supported networks
+
+* World Chain
+
+## GoldSky Subgraphs
+
+GoldSky Subgraphs is a data indexing service designed to simplify querying blockchain data. It provides developers with scalable, customizable subgraphs for
+efficiently indexing and retrieving on-chain data from various blockchain networks. GoldSky streamlines data access for decentralized applications (dApps),
+offering a user-friendly interface and advanced APIs that help developers query blockchain data faster and more accurately.
+
+### Supported networks
+
+* World Chain
+
+## Alchemy Subgraphs
+
+[Alchemy Subgraphs](https://docs.alchemy.com/reference/subgraphs-quickstart) provide fast, reliable blockchain indexing and community APIs.
+
+### Supported networks
+
+* World Chain
+* World Chain Sepolia
+
+## QuickNode
+
+Build real-time data processing pipelines with QuickNode Streams. Get instant access to World Chain data feeds with custom webhooks, filtering, and automatic retries. Backfill historical blockchain data in minutes with our ETL tools. Perfect for indexers, analytics platforms, and data-intensive applications.
+
+### Supported Resources
+
+* [Streams](https://www.quicknode.com/streams)
+* [Backfills](https://www.quicknode.com/streams/backfills)
+
+### Supported networks
+
+* World Chain
+* World Chain Sepolia
+
+## Noves
+
+[Noves](https://www.noves.fi/) provides easy-to-use APIs for a variety of data on World Chain. You can find documentation for Noves APIs [here](https://docs.noves.fi/reference/api-overview).
+
+### Supported networks
+
+* World Chain
+* World Chain Sepolia
+
+# Block Explorers
+
+## Blockscout
+
+A [Blockscout](https://blockscout.com/) explorer is available for [World Chain](https://worldchain-mainnet.explorer.alchemy.com/) provided by Alchemy.
+
+Blockscout is a comprehensive, open-source blockchain explorer designed for inspecting and analyzing EVM (Ethereum Virtual Machine) based blockchains.
+
+A testnet explorer is also available for [World Chain Sepolia](https://worldchain-sepolia.explorer.alchemy.com/).
+
+## Dora
+
+[Dora](https://www.ondora.xyz/network/worldchain/interactions) is an advanced multi-chain block explorer and unified search engine designed for the evolving blockchain ecosystem.
+It offers users the ability to search and interact with data across more than 10 different networks, including World Chain.
+
+It is an innovative blockchain explorer and search engine designed for the multichain and multi-VM world.
+
+## Worldscan (Etherscan)
+
+[Worldscan](https://worldscan.org) (provided by [Etherscan](https://etherscan.io)) is a comprehensive blockchain explorer and analytics platform specifically designed for the World Chain network.
+It allows users to search, verify, and analyze transactions, addresses, smart contracts, and tokens on the World Chain blockchain. [World Chain Sepolia](https://sepolia.worldscan.org/) is also supported.
+
+Worldscan provides tools to help you view transaction data and debug smart contracts:
+
+* Search by address, transaction hash, batch, or token
+* View, verify, and interact with smart contract source code
+* View detailed transaction information
+* View L1-to-L2 and L2-to-L1 transactions
+
+# Developer Tooling
+
+## Alchemy
+
+Alchemy provides a suite of data tools to make it easy to build on World Chain:
+
+* [APIs](https://docs.alchemy.com/reference/token-api-quickstart) provide out-of-the-box solutions to retrieve fungible token balances, metadata, and historical transaction activity.
+* [Webhooks](https://docs.alchemy.com/reference/notify-api-quickstart) allow you to configure real-time push notifications for on-chain activity.
+* [Subgraphs](https://docs.alchemy.com/reference/subgraphs-quickstart) provide fast, reliable blockchain indexing and community APIs.
+* [Account Kit](https://accountkit.alchemy.com/) provides smart wallets to grow your app. Securely onboard and activate users with no seed phrase or gas fees with easy-to-use, enterprise-grade wallets.
+
+### Supported networks
+
+* World Chain
+* World Chain Sepolia
+
+## Blocknative
+
+[Blocknative's Gas Price API](https://docs.blocknative.com/gas-prediction/gas-platform) predicts next-block gas prices.
+
+### Supported networks
+
+* World Chain
+
+## QuickNode
+
+Access comprehensive developer tools built for World Chain:
+
+* [RPC API](https://www.quicknode.com/core-api)
+* [Streams](https://www.quicknode.com/streams)
+* [Functions](https://www.quicknode.com/functions)
+* [Dedicated Clusters](https://www.quicknode.com/clusters)
+* [Rollup Deployer](https://www.quicknode.com/rollup)
+
+Each tool is designed for production-grade applications with enterprise-level support and documentation.
+
+### Supported networks
+
+* World Chain
+* World Chain Sepolia
+
+## Tenderly
+
+[Tenderly](https://tenderly.co/) is a blockchain development platform that provides tools for building, monitoring,
+and managing smart contracts on Ethereum and other EVM-compatible chains.
+It offers features like real-time transaction monitoring, debugging, and advanced analytics
+to help developers optimize and maintain their decentralized applications (dApps).
+
+### Supported networks
+
+* World Chain
+* World Chain Sepolia
+
+## Thirdweb
+
+[Thirdweb](https://thirdweb.com/) is a comprehensive web3 development platform that provides a full-stack, open-source toolkit for building decentralized applications on EVM-compatible chains. It offers frontend SDKs for connecting users to web3, backend APIs for scalable smart contract interactions, and a suite of pre-built, audited smart contracts. Thirdweb's platform simplifies the development process by providing tools for wallet integration, NFT minting, payment processing, and user onboarding, allowing developers to create sophisticated web3 applications with ease across various verticals including gaming, creator platforms, and enterprise solutions.
+
+### Supported networks
+
+* World Chain
+* World Chain Sepolia
+
+## Worldscan (Etherscan)
+
+[Worldscan](https://worldscan.org/) (provided by [Etherscan](https://etherscan.io/)) provides several valuable features for developers working with the Ethereum blockchain.
+Here are some key developer-focused features offered by Etherscan:
+
+* API access to the World Chain Blockchain explorer
+* Smart contract verification
+* Smart contract analytics
+* Gas Tracking
+
+### Supported networks
+
+* [World Chain](https://worldscan.org/)
+* [World Chain Sepolia](https://sepolia.worldscan.org/)
+
+# Oracles
+
+Blockchain oracles are essential middleware that allow smart contracts to access external data and systems that exist outside the blockchain. They act as a secure bridge between blockchains and external sources, enabling smart contracts to use data that primarily exists off-chain.
+
+## Api3
+
+[Api3](https://api3.org/) provides 200+ push-based data feeds on World Chain.
+
+You can enable any of Api3's data feeds on World Chain using the [Api3 Market](https://market.api3.org/world). Find the Api3 Market documentation [here](https://docs.api3.org/dapps/integration/).
+
+### Supported networks
+
+* World Chain
+
+## Chainlink Data Streams
+
+[Chainlink Data Streams](https://chain.link/) delivers low-latency market data offchain, which you can verify onchain.
+
+You can find documentation for Chainlink Data Streams Direct [here](https://docs.chain.link/data-streams/streams-direct).
+
+### Supported networks
+
+* World Chain
+
+## Pyth
+
+[Pyth](https://www.pyth.network/) provides 1300+ pull-based price feeds on World Chain.
+
+You can find documentation for Pyth Price Feeds [here](https://docs.pyth.network/price-feeds).
+
+### Supported networks
+
+* World Chain
+* World Chain Sepolia
+
+## RedStone
+
+[RedStone](https://www.redstone.finance/)'s Pull Model provides price data for 200+ assets that can be verified on World Chain.
+
+You can find documentation for RedStone's Pull Model [here](https://docs.redstone.finance/docs/dapps/redstone-pull/).
+
+### Supported networks
+
+* World Chain
+
+## WitNet
+
+[WitNet](https://witnet.io/) provides 6 price feeds on World Chain with Wit/Price Feeds, in addition to secure random data with Wit/Randomness and securely retrieving arbitrary data via HTTP from within smart contracts using Wit/Oracle.
+
+Documentation for these products can be found below:
+
+* [Wit/Price Feeds Documentation](https://docs.witnet.io/intro/tutorials/data-feeds-tutorial)
+* [Wit/Randomness Documentation](https://docs.witnet.io/intro/tutorials/randomness)
+* [Wit/Oracle Documentation](https://docs.witnet.io/intro/tutorials/apis-and-http-get-post)
+
+### Supported networks
+
+* World Chain
+* World Chain Sepolia
+
+# Paymasters
+
+## Alchemy
+
+[Alchemy Paymasters](https://www.alchemy.com/overviews/what-is-a-paymaster) are smart contracts that enable decentralized applications (dApps) to implement flexible gas policies, including:
+
+* Sponsoring gas fees for users
+* Accepting gas payments in ERC-20 tokens instead of native blockchain currency
+
+### Supported Networks
+
+* World Chain
+* World Chain Sepolia
+
+## Pimlico
+
+[Pimlico](https://pimlico.io/) provides account abstraction infrastructure including [paymasters](https://docs.pimlico.io/infra/paymaster) and [bundlers](https://docs.pimlico.io/infra/bundler). They offer two types of paymasters to abstract away gas fees for users in the ERC-4337 ecosystem.
+A verifying paymaster allows developers to sponsor on-chain gas fees for users, it utilizes an off-chain Pimlico balance loaded through a dashboard and an ERC-20 paymaster which is a permissionless on-chain smart contract that enables users to pay gas fees using their ERC-20 tokens and operates without requiring developer intervention.
+
+Pimlico's paymasters can be seamlessly integrated with [permissionless.js](https://docs.pimlico.io/permissionless), a TypeScript library built on [viem](https://github.com/wevm/viem/) for ERC-4337 development .
+
+### Supported Networks
+
+* World Chain
+* World Chain Sepolia
+
+## Thirdweb
+
+Not only does [Thirdweb](https://thirdweb.com/) provide developer tools, but they also have [ERC-4337 compliant smart contract accounts](https://portal.thirdweb.com/contracts/build/base-contracts/erc-4337) with role-based permission control. They offer two main types: Simple and Managed smart accounts.
+
+### Supported Networks
+
+* World Chain
+* World Chain Sepolia
+
+# Onramps
+
+## Ramp Network
+
+[Ramp Network](https://ramp.network/) is a fintech company that provides a seamless, non-custodial fiat-to-crypto and crypto-to-fiat onramp solution for decentralized applications, wallets, and platforms. It enables users to buy, sell, and trade cryptocurrencies directly through integrated services without leaving the app they are using. Ramp focuses on simplifying the process for users by handling complex regulatory compliance, identity verification (KYC), and liquidity provisioning,
+making it easier for businesses to integrate crypto transactions into their services.
+Their API is widely used by developers to onboard users into the crypto ecosystem with minimal friction.
+
+## Alfred pay
+
+[Alfred Pay](https://www.alfredpay.io/) is a fintech company focused on bridging the gap between traditional financial systems and digital assets, specifically across Latin America. It offers a fiat-to-crypto and crypto-to-fiat gateway service, enabling users and businesses to easily move between digital currencies and local fiat currencies.
+
+## Moonpay
+
+[MoonPay](https://www.moonpay.com/) is a global fintech platform that simplifies the process of buying and selling cryptocurrencies. It provides a seamless fiat-to-crypto and crypto-to-fiat service, allowing users to purchase digital assets like Bitcoin and Ethereum using traditional payment methods such as credit cards, bank transfers, and mobile payment options. MoonPay also offers APIs and SDKs for developers to integrate crypto transactions into their applications.
+
+
+Tokens
+Contract World Chain Mainnet Address
+WLD :	0x2cfc85d8e48f8eab294be644d9e25c3030863003
+
+# How to Set Up a World Chain Node
+
+Follow this guide to set up your own World Chain node.
+
+## Overview
+
+World Chain mainnet and testnet run on the OP Stack as part of the Superchain. We provide a simple Docker Compose configuration for running World Chain nodes, [simple-worldchain-node](https://github.com/worldcoin-foundation/simple-worldchain-node). If you're interested in building a node from source, see the [documentation from Optimism](https://docs.optimism.io/operators/node-operators/tutorials/node-from-source).
+
+## Using `simple-worldchain-node`
+
+`simple-worldchain-node` supports World Chain Mainnet and Sepolia, full nodes and archive nodes, and two execution clients: [op-geth](https://github.com/ethereum-optimism/op-geth) and [op-reth](https://github.com/paradigmxyz/reth).
+
+<Note>
+  World Chain node snapshots for `op-geth` are available from Bware Labs [here](https://bwarelabs.com/snapshots/worldchain).
+</Note>
+
+### Installation
+
+First, download [`simple-worldchain-node`](https://github.com/worldcoin-foundation/simple-worldchain-node) and create your `.env` file.
+
+<CodeGroup>
+  ```bash Download simple-worldchain-node theme={null}
+  git clone https://github.com/worldcoin-foundation/simple-worldchain-node.git
+  cd simple-worldchain-node
+  cp .env.example .env
+  ```
+</CodeGroup>
+
+Ensure you have installed Docker and Docker Compose by following [this guide](https://docs.docker.com/compose/install/#scenario-three-install-the-docker-compose-standalone).
+
+### Configuration
+
+Open your `.env` file in an editor of your choice. The following values must be configured before starting your node.
+
+<ParamField body="NETWORK_NAME" type="worldchain-mainnet | worldchain-sepolia" required>
+  Used to select which network the node connects to, either `worldchain-mainnet` or `worldchain-sepolia`.
+</ParamField>
+
+<ParamField body="COMPOSE_PROFILES" type="geth | reth" required>
+  Used to select your execution client, either `geth` (default) or `reth` (experimental).
+</ParamField>
+
+<ParamField body="GETH_NODE_TYPE" type="full | archive" required>
+  When using `op-geth`, determines which type of node to run. Either `full` (less storage, but only recent history) or `archive` (more storage, all history).
+</ParamField>
+
+<ParamField body="L1_RPC_ENDPOINT" type="URL" required>
+  An L1 (Ethereum) RPC endpoint. We recommend using [Alchemy](https://www.alchemy.com/) or [QuickNode](https://www.quicknode.com), but any Ethereum RPC provider or archive node will work.
+</ParamField>
+
+<ParamField body="L1_BEACON_RPC_ENDPOINT" type="URL" required>
+  An L1 Beacon Archive RPC endpoint. Note that this is not the same as a standard RPC endpoint, as this is used to retrieve Blobs from the Ethereum Beacon Chain. We recommend using [QuickNode](https://www.quicknode.com/).
+</ParamField>
+
+<ParamField body="L1_RPC_TYPE" type="string" required>
+  Selects which RPC provider is set in `OP_NODE__RPC_ENDPOINT`. This allows for more efficient syncing given different RPC capabilities. Choose from `alchemy`, `quicknode`, `erigon`, or `basic` for other RPC providers.
+</ParamField>
+
+For details on optional settings, see the `simple-worldchain-node` [README](https://github.com/worldcoin-foundation/simple-worldchain-node?tab=readme-ov-file#optional-configurations).
+
+### Running your node
+
+To start your node in the background, run the following command from the `simple-worldchain-node` folder:
+
+```bash  theme={null}
+docker compose up -d --build
+```
+
+To view logs for your node, run the following command:
+
+```bash  theme={null}
+docker compose logs -f --tail 10
+```
+
+To shut down your node:
+
+```bash  theme={null}
+docker compose down
+```
+
+### Monitoring your node
+
+A Grafana dashboard is included to monitor your node. Access it by visiting [http://localhost:3000](http://localhost:3000) and logging in with these credentials:
+
+* Username: `admin`
+* Password: `worldchain`
+
+### Upgrading your Node
+
+When new versions of `op-geth`, `op-reth`, or `op-node` are released, we will update the `simple-worldchain-node` repository to use these new versions. You can then update your node to use these versions with the following commands:
+
+```bash  theme={null}
+git pull
+docker compose pull
+docker compose up -d --build
+```
+
+# Token Bridging Guide
+
+## 1. Deploy your token on World Chain
+
+Choose your preferred bridging framework and use it to deploy an ERC-20 for your token on World Chain.
+We recommend using the framework provided by World Chain's [standard bridge contracts](https://github.com/ethereum-optimism/specs/blob/main/specs/protocol/bridges.md),
+and deploying your token with the [OptimismMintableERC20Factory](/world-chain/developers/world-chain-contracts).
+This deployment method offers guarantees that will streamline the approval process. If you opt for a different bridging framework,
+it must be compatible with the standard bridge interface, or we may have difficulty supporting it.
+
+## 2. Submit details for your token
+
+Follow the instructions in the [GitHub repository](https://github.com/ethereum-optimism/ethereum-optimism.github.io) and submit a PR with the required details for your token.
+You must specify a section for `worldchain-sepolia` and/or `worldchain` in your token's data.json file.
+The submission is straightforward if your token is already listed on the Superchain token list.
+
+## 3. Await final approval
+
+The World team regularly reviews submissions, and you should receive a response within 24-72 hours, depending on whether the PR is submitted on a weekday, weekend, or holiday.
+
+# Resources
+
+## Status Links
+
+* [World Chain Mainnet Status](https://worldchain-mainnet-status.alchemy.com/)
+* [World Chain Sepolia Status](https://worldchain-sepolia-status.alchemy.com/)
+
+## Documentation
+
+* [Brand Kit](https://world.org/press)
+* [World Whitepaper](https://whitepaper.world.org/)
+
+## Legal
+
+* [Terms of Service](https://vault.pactsafe.io/s/8a18d792-fd76-44db-9b92-b0bb7981c248/legal.html#contract-byutjvtyt)
+* [Privacy Policy](https://vault.pactsafe.io/s/8a18d792-fd76-44db-9b92-b0bb7981c248/legal.html#contract-s1ytru6kk)
