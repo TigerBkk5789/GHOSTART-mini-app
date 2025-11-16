@@ -4,7 +4,7 @@ const Explore: React.FC = () => {
   return (
     <div className="min-h-screen bg-black text-white p-4 pt-8">
       <header className="text-center mb-8 animate-fade-in-down">
-        <img src="/ghostart-logo.png" alt="GHOSTART Logo" className="w-32 h-32 mx-auto mb-4 rounded-2xl shadow-lg shadow-brand-pink/50" />
+        <img src="/ghostart-logo.png" alt="GHOSTART Logo" className="w-40 h-40 mx-auto mb-4 rounded-2xl shadow-lg shadow-brand-pink/50 object-contain" />
         <h1 className="text-5xl font-bold tracking-tighter bg-clip-text text-transparent bg-gradient-to-r from-brand-purple via-brand-pink to-brand-blue">
           GHOSTART
         </h1>
@@ -13,9 +13,9 @@ const Explore: React.FC = () => {
 
       <div className="bg-gray-900/50 rounded-2xl p-6 mb-8 border border-gray-700 backdrop-blur-sm animate-fade-in">
         <img 
-          src="https://picsum.photos/seed/ghostartbanner/600/300" 
-          alt="GHOSTART Banner" 
-          className="w-full h-48 object-cover rounded-lg mb-6"
+          src="/ghostart-banner.png" 
+          alt="GHOSTART Token Trading Banner" 
+          className="w-full h-auto object-contain rounded-lg mb-6"
         />
         <h2 className="text-2xl font-bold mb-2">Early Access Trading is Live!</h2>
         <p className="text-gray-300 mb-4">
