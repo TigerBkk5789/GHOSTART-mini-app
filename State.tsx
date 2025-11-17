@@ -81,7 +81,7 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
             throw error;
         }
     };
-
+    
     const buyNft = (nftId: number, addr = walletAddress || '') => {
         // This would trigger a blockchain transaction in production
         setNfts(prevNfts => prevNfts.map(nft =>

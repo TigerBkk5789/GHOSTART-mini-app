@@ -25,7 +25,7 @@ const Mint: React.FC = () => {
         }
         setIsMinting(true);
         setMintStatus('idle');
-        
+
         try {
             await mintNft({
                 name: nftName,

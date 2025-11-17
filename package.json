@@ -12,6 +12,7 @@
     "dev:all": "concurrently \"npm run dev\" \"npm run server:dev\""
   },
   "dependencies": {
+    "@worldcoin/minikit-js": "^1.9.8",
     "ethers": "^6.15.0",
     "react": "^19.2.0",
     "react-dom": "^19.2.0",

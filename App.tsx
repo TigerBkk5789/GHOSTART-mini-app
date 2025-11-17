@@ -1,6 +1,7 @@
 
 import React from 'react';
 import { HashRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { MiniKitProvider } from '@worldcoin/minikit-js/minikit-provider';
 import { AppProvider } from './State';
 import Explore from './pages/Explore';
 import Mint from './pages/Mint';
@@ -11,6 +12,7 @@ import NftDetail from './pages/NftDetail';
 
 const App: React.FC = () => {
   return (
+    <MiniKitProvider>
     <AppProvider>
       <HashRouter>
         <div className="flex flex-col h-screen font-sans">
@@ -28,6 +30,7 @@ const App: React.FC = () => {
         </div>
       </HashRouter>
     </AppProvider>
+    </MiniKitProvider>
   );
 };
 

@@ -4,6 +4,7 @@ import { useAppContext } from '../State';
 import { Nft } from '../types';
 import { ethers } from 'ethers';
 import { isOwnerAddress } from '../src/utils/constants';
+import { connectWallet, connectWorldWallet, connectMetaMask, getCurrentWallet, isWorldApp } from '../src/utils/wallet';
 
 const TabButton: React.FC<{
     tabName: string;
@@ -27,13 +28,16 @@ const TabButton: React.FC<{
 
 
 const Wallet: React.FC = () => {
-    const { nfts, listNft, walletAddress: contextWalletAddress, refreshNFTs } = useAppContext();
+    const { nfts, listNft, walletAddress: contextWalletAddress, refreshNFTs, setWalletAddress: setContextWallet } = useAppContext();
     const [walletAddress, setWalletAddress] = useState<string | null>(contextWalletAddress || null);
     const [wldBalance, setWldBalance] = useState(0);
     const [ghoBalance, setGhoBalance] = useState(0);
     const [stakedAmount, setStakedAmount] = useState(0);
     const [stakeInput, setStakeInput] = useState('');
     const [activeTab, setActiveTab] = useState('nfts');
+    const [isConnecting, setIsConnecting] = useState(false);
+    const [connectionError, setConnectionError] = useState<string | null>(null);
+    const [isWorldWallet, setIsWorldWallet] = useState(false);
 
     const [isListModalOpen, setIsListModalOpen] = useState(false);
     const [listingNft, setListingNft] = useState<Nft | null>(null);
@@ -50,43 +54,89 @@ const Wallet: React.FC = () => {
         }
     }, [walletAddress, refreshNFTs]);
 
+    // Check for existing wallet connection on mount
     useEffect(() => {
-        const connectAndLoad = async () => {
-            if (window.ethereum) {
-                const provider = new ethers.BrowserProvider(window.ethereum);
-                // Prompt connect if needed
-                const accounts = await provider.send("eth_requestAccounts", []);
-                setWalletAddress(accounts[0]);
-                // Fetch GHOSTART balance
-                const ghoContract = new ethers.Contract(
-                    '0x4df029e25EA0043fCb7A7f15f2b25F62C9BDb990',
-                    ["function balanceOf(address) view returns (uint256)", "function decimals() view returns (uint8)"],
-                    provider
-                );
-                const rawGho = await ghoContract.balanceOf(accounts[0]);
-                const decimals = await ghoContract.decimals();
-                setGhoBalance(Number(ethers.formatUnits(rawGho, decimals)));
-                // Fetch WLD balance (replace 0x163f8C24... with correct WLD address)
-                const wldContract = new ethers.Contract(
-                    '0x163f8C2467924be0ae7B5347228CABF260318753',
-                    ["function balanceOf(address) view returns (uint256)", "function decimals() view returns (uint8)"],
-                    provider
-                );
-                const rawWld = await wldContract.balanceOf(accounts[0]);
-                const wldDecimals = await wldContract.decimals();
-                setWldBalance(Number(ethers.formatUnits(rawWld, wldDecimals)));
+        const checkExistingConnection = async () => {
+            try {
+                const address = await getCurrentWallet();
+                if (address) {
+                    setWalletAddress(address);
+                    setIsWorldWallet(isWorldApp());
+                    await loadBalances(address);
+                }
+            } catch (error) {
+                console.log('No existing wallet connection');
             }
         };
-        connectAndLoad();
-        // Listen for account/network changes
-        if (window.ethereum) {
-            window.ethereum.on("accountsChanged", connectAndLoad);
-            window.ethereum.on("chainChanged", () => window.location.reload());
+        checkExistingConnection();
+    }, []);
+
+    // Load token balances
+    const loadBalances = async (address: string) => {
+        try {
+            let provider: ethers.Provider;
+            
+            if (isWorldApp()) {
+                // For World Wallet, use RPC provider
+                provider = new ethers.JsonRpcProvider('https://worldchain-mainnet.g.alchemy.com/public');
+            } else if (window.ethereum) {
+                // For MetaMask, use BrowserProvider
+                provider = new ethers.BrowserProvider(window.ethereum as ethers.Eip1193Provider);
+            } else {
+                return;
+            }
+
+            // Fetch GHOSTART balance
+            const ghoContract = new ethers.Contract(
+                '0x4df029e25EA0043fCb7A7f15f2b25F62C9BDb990',
+                ["function balanceOf(address) view returns (uint256)", "function decimals() view returns (uint8)"],
+                provider
+            );
+            const rawGho = await ghoContract.balanceOf(address);
+            const decimals = await ghoContract.decimals();
+            setGhoBalance(Number(ethers.formatUnits(rawGho, decimals)));
+
+            // Fetch WLD balance
+            const wldContract = new ethers.Contract(
+                '0x163f8C2467924be0ae7B5347228CABF260318753',
+                ["function balanceOf(address) view returns (uint256)", "function decimals() view returns (uint8)"],
+                provider
+            );
+            const rawWld = await wldContract.balanceOf(address);
+            const wldDecimals = await wldContract.decimals();
+            setWldBalance(Number(ethers.formatUnits(rawWld, wldDecimals)));
+        } catch (error) {
+            console.error('Error loading balances:', error);
+        }
+    };
+
+    // Listen for account/network changes (MetaMask only)
+    useEffect(() => {
+        if (window.ethereum && !isWorldApp()) {
+            const handleAccountsChanged = async (accounts: string[]) => {
+                if (accounts.length === 0) {
+                    setWalletAddress(null);
+                    setWldBalance(0);
+                    setGhoBalance(0);
+                } else {
+                    setWalletAddress(accounts[0]);
+                    await loadBalances(accounts[0]);
+                }
+            };
+
+            const handleChainChanged = () => {
+                window.location.reload();
+            };
+
+            window.ethereum.on("accountsChanged", handleAccountsChanged);
+            window.ethereum.on("chainChanged", handleChainChanged);
+
             return () => {
-                window.ethereum.removeListener("accountsChanged", connectAndLoad);
+                window.ethereum?.removeListener("accountsChanged", handleAccountsChanged);
+                window.ethereum?.removeListener("chainChanged", handleChainChanged);
             };
         }
-    }, []);
+    }, [isWorldWallet]);
 
     const handleStake = () => {
         const amount = parseFloat(stakeInput);
@@ -121,8 +171,8 @@ const Wallet: React.FC = () => {
         }
         try {
             await listNft(listingNft.id, price, walletAddress);
-            handleCloseListModal();
-            alert(`${listingNft.name} has been listed on the marketplace!`);
+        handleCloseListModal();
+        alert(`${listingNft.name} has been listed on the marketplace!`);
         } catch (error: any) {
             alert(error.message || 'Failed to list NFT');
         }
@@ -140,45 +190,74 @@ const Wallet: React.FC = () => {
                 </p>
 
                 <div className="w-full max-w-xs space-y-4">
+                    {/* World ID Wallet - Primary Option */}
                     <button
-                        onClick={() => {
-                            if (window.ethereum) {
-                                window.ethereum.request({ method: "eth_requestAccounts" }).then(accounts => {
-                                    setWalletAddress(accounts[0]);
-                                }).catch(err => {
-                                    console.error("User denied account access or error occurred", err);
-                                });
-                            } else {
-                                alert("MetaMask is not installed. Please install it.");
+                        onClick={async () => {
+                            setIsConnecting(true);
+                            setConnectionError(null);
+                            try {
+                                const connection = await connectWorldWallet();
+                                setWalletAddress(connection.address);
+                                setIsWorldWallet(connection.isWorldWallet);
+                                await loadBalances(connection.address);
+                                // Update context wallet address
+                                setContextWallet(connection.address);
+                            } catch (error: any) {
+                                setConnectionError(error.message || 'Failed to connect World Wallet');
+                                console.error('World Wallet connection error:', error);
+                            } finally {
+                                setIsConnecting(false);
                             }
                         }}
-                        className="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg transition-all duration-200 flex items-center justify-center space-x-3"
+                        disabled={isConnecting}
+                        className="w-full bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 text-white font-bold py-3 px-6 rounded-lg transition-all duration-200 flex items-center justify-center space-x-3 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                         <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                             <path d="M12 16C14.2091 16 16 14.2091 16 12C16 9.79086 14.2091 8 12 8C9.79086 8 8 9.79086 8 12C8 14.2091 9.79086 16 12 16Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
                         </svg>
-                        <span>Connect World App</span>
+                        <span>{isConnecting ? 'Connecting...' : 'Connect World ID Wallet'}</span>
                     </button>
+
+                    {/* MetaMask - Secondary Option */}
                     <button
-                        onClick={() => {
-                            if (window.ethereum) {
-                                window.ethereum.request({ method: "eth_requestAccounts" }).then(accounts => {
-                                    setWalletAddress(accounts[0]);
-                                }).catch(err => {
-                                    console.error("User denied account access or error occurred", err);
-                                });
-                            } else {
-                                alert("MetaMask is not installed. Please install it.");
+                        onClick={async () => {
+                            setIsConnecting(true);
+                            setConnectionError(null);
+                            try {
+                                const connection = await connectMetaMask();
+                                setWalletAddress(connection.address);
+                                setIsWorldWallet(false);
+                                await loadBalances(connection.address);
+                                // Update context wallet address
+                                setContextWallet(connection.address);
+                            } catch (error: any) {
+                                setConnectionError(error.message || 'Failed to connect MetaMask');
+                                console.error('MetaMask connection error:', error);
+                            } finally {
+                                setIsConnecting(false);
                             }
                         }}
-                        className="w-full bg-gray-700 hover:bg-gray-600 text-white font-bold py-3 px-6 rounded-lg transition-all duration-200 flex items-center justify-center space-x-3"
+                        disabled={isConnecting}
+                        className="w-full bg-gray-700 hover:bg-gray-600 text-white font-bold py-3 px-6 rounded-lg transition-all duration-200 flex items-center justify-center space-x-3 disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                         <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                             <path strokeLinecap="round" strokeLinejoin="round" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
                         </svg>
-                        <span>Connect MetaMask</span>
+                        <span>{isConnecting ? 'Connecting...' : 'Connect MetaMask'}</span>
                     </button>
+
+                    {connectionError && (
+                        <div className="bg-red-900/50 border border-red-600 rounded-lg p-3 text-sm text-red-200">
+                            {connectionError}
+                        </div>
+                    )}
+
+                    {isWorldApp() && (
+                        <p className="text-xs text-gray-500 text-center">
+                            💡 You're in World App - World ID Wallet is recommended
+                        </p>
+                    )}
                 </div>
             </div>
         );
@@ -247,35 +326,35 @@ const Wallet: React.FC = () => {
                     </div>
 
                     {activeTab === 'nfts' && (
-                        <div id="tabpanel-nfts" role="tabpanel" aria-labelledby="tab-nfts" hidden={activeTab !== 'nfts'}>
-                            <div className="animate-fade-in">
-                                {myNfts.length > 0 ? (
-                                    <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
-                                        {myNfts.map(nft => (
-                                            <div key={nft.id} className="bg-gray-800 rounded-lg overflow-hidden border border-gray-700 flex flex-col">
-                                                <img src={nft.image} alt={nft.name} className="w-full h-32 object-cover" />
-                                                <div className="p-2 flex-grow flex flex-col">
-                                                    <p className="text-sm font-semibold p-1 truncate flex-grow">{nft.name}</p>
+                    <div id="tabpanel-nfts" role="tabpanel" aria-labelledby="tab-nfts" hidden={activeTab !== 'nfts'}>
+                        <div className="animate-fade-in">
+                            {myNfts.length > 0 ? (
+                                <div className="grid grid-cols-2 sm:grid-cols-3 gap-4">
+                                    {myNfts.map(nft => (
+                                        <div key={nft.id} className="bg-gray-800 rounded-lg overflow-hidden border border-gray-700 flex flex-col">
+                                            <img src={nft.image} alt={nft.name} className="w-full h-32 object-cover" />
+                                            <div className="p-2 flex-grow flex flex-col">
+                                                <p className="text-sm font-semibold p-1 truncate flex-grow">{nft.name}</p>
                                                     {isOwnerAddress(walletAddress) && (
-                                                        <button 
-                                                            onClick={() => handleOpenListModal(nft)}
-                                                            className="mt-2 w-full bg-brand-blue hover:bg-brand-pink text-white font-bold py-1 px-2 rounded-md text-xs transition-colors"
-                                                        >
-                                                            List NFT
-                                                        </button>
+                                                <button 
+                                                    onClick={() => handleOpenListModal(nft)}
+                                                    className="mt-2 w-full bg-brand-blue hover:bg-brand-pink text-white font-bold py-1 px-2 rounded-md text-xs transition-colors"
+                                                >
+                                                    List NFT
+                                                </button>
                                                     )}
-                                                </div>
                                             </div>
-                                        ))}
-                                    </div>
-                                ) : (
-                                    <div className="bg-gray-800 p-6 rounded-lg text-center border border-gray-700">
-                                        <p className="text-gray-400">You don't own any NFTs yet.</p>
-                                        <p className="text-sm text-gray-500 mt-2">Go to the marketplace to start your collection!</p>
-                                    </div>
-                                )}
-                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            ) : (
+                                <div className="bg-gray-800 p-6 rounded-lg text-center border border-gray-700">
+                                    <p className="text-gray-400">You don't own any NFTs yet.</p>
+                                    <p className="text-sm text-gray-500 mt-2">Go to the marketplace to start your collection!</p>
+                                </div>
+                            )}
                         </div>
+                    </div>
                     )}
                 </div>
             </div>
